@@ -3,12 +3,14 @@ package push
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/KevinYouu/fastGit/functions/choose"
 	"github.com/KevinYouu/fastGit/functions/colors"
 	"github.com/KevinYouu/fastGit/functions/input"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
 )
 
 func PushAll() {
@@ -55,10 +57,32 @@ func PushAll() {
 		os.Exit(1)
 	}
 
+	// 获取当前用户的家目录
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Println("Failed to get user's home directory:", err)
+		os.Exit(1)
+	}
+
+	// 读取私钥文件内容
+	privateKeyPath := filepath.Join(homeDir, ".ssh", "id_rsa")
+	privateKey, err := os.ReadFile(privateKeyPath)
+	if err != nil {
+		fmt.Println("Failed to read private key file:", err)
+		os.Exit(1)
+	}
+
+	// 创建 SSH 私钥认证
+	auth, err := ssh.NewPublicKeys("git", []byte(privateKey), "")
+	if err != nil {
+		fmt.Println("Failed to create SSH auth:", err)
+		os.Exit(1)
+	}
 	// push changes
 	err = remote.Push(&git.PushOptions{
 		RemoteName: remote.Config().Name,
 		RemoteURL:  remote.Config().URLs[0],
+		Auth:       auth,
 	})
 	if err != nil {
 		fmt.Println(colors.RenderColor("red", "Failed to push to remote repository:"), err)

@@ -57,14 +57,14 @@ func PushAll() {
 		os.Exit(1)
 	}
 
-	// 获取当前用户的家目录
+	// get the user's home directory
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		fmt.Println("Failed to get user's home directory:", err)
 		os.Exit(1)
 	}
 
-	// 读取私钥文件内容
+	// read the private key
 	privateKeyPath := filepath.Join(homeDir, ".ssh", "id_rsa")
 	privateKey, err := os.ReadFile(privateKeyPath)
 	if err != nil {
@@ -72,7 +72,7 @@ func PushAll() {
 		os.Exit(1)
 	}
 
-	// 创建 SSH 私钥认证
+	// create the SSH auth
 	auth, err := ssh.NewPublicKeys("git", []byte(privateKey), "")
 	if err != nil {
 		fmt.Println("Failed to create SSH auth:", err)

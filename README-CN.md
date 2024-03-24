@@ -27,6 +27,18 @@ wget -qO- https://github.com/KevinYouu/fastGit/install.sh | bash
 fastGit pa
 ```
 
+### 功能
+
+- [x] `fastGit pa`, 提交工作区全部已更改的代码
+
+- [x] `fastGit ra`，用于添加远程仓库
+
+- [ ] `fastGit ps`，用于提交部分已修改的代码
+
+- [ ] `fastGit rb`，用于删除远程仓库
+
+.....
+
 ### 感谢以下开源项目
 
 [go](https://github.com/golang/go)

@@ -1,4 +1,4 @@
-package gitfunctions
+package log
 
 import (
 	"fmt"

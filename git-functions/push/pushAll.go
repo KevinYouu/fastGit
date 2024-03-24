@@ -8,6 +8,7 @@ import (
 	"github.com/KevinYouu/fastGit/functions/choose"
 	"github.com/KevinYouu/fastGit/functions/colors"
 	"github.com/KevinYouu/fastGit/functions/input"
+	"github.com/KevinYouu/fastGit/functions/log"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
@@ -17,7 +18,7 @@ func PushAll() {
 	repoPath := "."
 
 	suffix := choose.Choose()
-	data := input.Input("Enter your commit message: ", "commit message", "(esc to quit)")
+	data := input.Input("Enter your commit message: \n", "commit message", "\n(esc to quit)")
 
 	// open the repository
 	repo, err := git.PlainOpen(repoPath)
@@ -30,30 +31,6 @@ func PushAll() {
 	worktree, err := repo.Worktree()
 	if err != nil {
 		fmt.Println(colors.RenderColor("red", "Failed to get worktree:"), err)
-		os.Exit(1)
-	}
-
-	// add all files to the index
-	_, err = worktree.Add(".")
-	if err != nil {
-		fmt.Println(colors.RenderColor("red", "Failed to add file to index:"), err)
-		os.Exit(1)
-	}
-
-	// commit changes
-	_, err = worktree.Commit(suffix+": "+data, &git.CommitOptions{})
-
-	if err != nil {
-		fmt.Println(colors.RenderColor("red", "Failed to commit changes:"), err)
-		os.Exit(1)
-	}
-
-	fmt.Println(colors.RenderColor("green", "Changes added to index and committed successfully"))
-
-	// get the remote
-	remote, err := repo.Remote("origin")
-	if err != nil {
-		fmt.Println(colors.RenderColor("red", "Failed to get remote:"), err)
 		os.Exit(1)
 	}
 
@@ -78,6 +55,36 @@ func PushAll() {
 		fmt.Println("Failed to create SSH auth:", err)
 		os.Exit(1)
 	}
+
+	err = worktree.Pull(&git.PullOptions{Auth: auth})
+	if err != nil && err != git.NoErrAlreadyUpToDate {
+		log.CheckIfError(err)
+	}
+
+	// get the remote
+	remote, err := repo.Remote("origin")
+	if err != nil {
+		fmt.Println(colors.RenderColor("red", "Failed to get remote:"), err)
+		os.Exit(1)
+	}
+
+	// add all files to the index
+	_, err = worktree.Add(".")
+	if err != nil {
+		fmt.Println(colors.RenderColor("red", "Failed to add file to index:"), err)
+		os.Exit(1)
+	}
+
+	// commit changes
+	_, err = worktree.Commit(suffix+": "+data, &git.CommitOptions{})
+
+	if err != nil {
+		fmt.Println(colors.RenderColor("red", "Failed to commit changes:"), err)
+		os.Exit(1)
+	}
+
+	fmt.Println(colors.RenderColor("green", "Changes added to index and committed successfully"))
+
 	// push changes
 	err = remote.Push(&git.PushOptions{
 		RemoteName: remote.Config().Name,

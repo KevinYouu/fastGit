@@ -10,6 +10,8 @@ builds:
   - id: build_noncgo
     main: ./
     binary: fastGit
+    ldflags:
+      - -s -w -X github.com/KevinYouu/fastGit.Version={{ .Version }}
     env:
       - CGO_ENABLED=0
     goos:
@@ -28,8 +30,8 @@ builds:
       - goos: darwin
         goarch: arm
 
-release:
-  draft: true
+# release:
+#   draft: true
 
 archives:
   - id: archive_noncgo

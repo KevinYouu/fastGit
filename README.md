@@ -6,6 +6,23 @@ fastGit is a tool that helps you quickly submit code with a command line interfa
 
 ![](assets/fast-git.gif)
 
+### How to use
+
+#### Install fastGit
+
+```bash
+# Linux/macOS
+curl -sSL https://github.com/KevinYouu/fastGit/install.sh | bash
+# or
+wget -qO- https://github.com/KevinYouu/fastGit/install.sh | bash
+```
+
+#### Run
+
+```bash
+fastGit pa
+```
+
 ### Thanks to the following open source projects
 
 [go](https://github.com/golang/go)

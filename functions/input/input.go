@@ -30,6 +30,7 @@ type model struct {
 	err        error
 	prompt     string // New field to store the prompt
 	quitPrompt string
+	quitting   bool
 }
 
 // initialModel function initializes a new model with the provided prompt, placeholder,and exit prompt.
@@ -60,12 +61,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyEnter, tea.KeyCtrlC, tea.KeyEsc:
+			m.quitting = true
 			return m, tea.Quit
 		}
 
 	// We handle errors just like any other message
 	case errMsg:
 		m.err = msg
+		m.quitting = true
 		return m, nil
 	}
 
@@ -75,6 +78,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 // View method renders the user interface, including the prompt and input field
 func (m model) View() string {
+	if m.quitting {
+		return "" // clear the screen
+	}
+
 	return fmt.Sprintf(
 		"%s\n%s\n%s",
 		m.prompt,           // Display the prompt

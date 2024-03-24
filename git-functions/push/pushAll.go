@@ -48,7 +48,7 @@ func PushAll() {
 		os.Exit(1)
 	}
 
-	fmt.Println(colors.RenderColor("blue", "Changes added to index and committed successfully"))
+	fmt.Println(colors.RenderColor("green", "Changes added to index and committed successfully"))
 
 	// get the remote
 	remote, err := repo.Remote("origin")
@@ -83,6 +83,7 @@ func PushAll() {
 		RemoteName: remote.Config().Name,
 		RemoteURL:  remote.Config().URLs[0],
 		Auth:       auth,
+		Progress:   os.Stdout,
 	})
 	if err != nil {
 		fmt.Println(colors.RenderColor("red", "Failed to push to remote repository:"), err)

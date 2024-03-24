@@ -2,7 +2,7 @@ English | [简体中文](README-CN.md)
 
 fastGit is a tool that helps you quickly submit code with a command line interface. It supports Linux, Mac, and Windows. The inspiration comes from [gum](https://github.com/charmbracelet/gum)
 
-> Project itself is using it to submit code
+> This project is utilizing its own features to submit code.
 
 ![](assets/fast-git.gif)
 
@@ -13,7 +13,11 @@ fastGit is a tool that helps you quickly submit code with a command line interfa
 ```bash
 # Linux/macOS
 curl -sSL https://github.com/KevinYouu/fastGit/install.sh | bash
-# or
+```
+
+or
+
+```bash
 wget -qO- https://github.com/KevinYouu/fastGit/install.sh | bash
 ```
 

@@ -4,6 +4,8 @@ fastGit is a tool that helps you quickly submit code with a command line interfa
 
 > Project itself is using it to submit code
 
+![](assets/fast-git.gif)
+
 ### Thanks to the following open source projects
 
 [go](https://github.com/golang/go)

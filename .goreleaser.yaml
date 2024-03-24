@@ -1,0 +1,48 @@
+project_name: fastGit
+
+dist: .builds
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: build_noncgo
+    main: ./
+    binary: fastGit
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+      - arm
+    goarm:
+      - 7
+    ignore:
+      - goos: windows
+        goarch: arm
+      - goos: darwin
+        goarch: arm
+
+release:
+  draft: true
+
+archives:
+  - id: archive_noncgo
+    builds: [build_noncgo]
+    format: zip
+    files:
+      - LICENSE
+
+checksum:
+  name_template: 'checksums.txt'
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^assets:'

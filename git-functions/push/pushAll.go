@@ -7,10 +7,12 @@ import (
 
 	"github.com/KevinYouu/fastGit/functions/choose"
 	"github.com/KevinYouu/fastGit/functions/colors"
+	"github.com/KevinYouu/fastGit/functions/form"
 	"github.com/KevinYouu/fastGit/functions/input"
 	"github.com/KevinYouu/fastGit/functions/log"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
 )
 
@@ -58,9 +60,38 @@ func PushAll() {
 
 	err = worktree.Pull(&git.PullOptions{Auth: auth})
 	if err != nil && err != git.NoErrAlreadyUpToDate {
-		log.CheckIfError(err)
+		fmt.Println(colors.RenderColor("yellow", "SSH submission failed, Trying to push with username and password..."), err)
+
+		formData := form.FormProps{
+			Message:      "Enter the following information:",
+			Field:        "username",
+			Field2:       "password",
+			FieldLength:  8,
+			Field2Length: 8,
+		}
+		username, password, err := form.FormInput(formData)
+		if err != nil {
+			fmt.Println(colors.RenderColor("red", "Failed to get username and password: "), err)
+			os.Exit(1)
+		}
+		if username == "" || password == "" {
+			fmt.Println("GIT_USERNAME and/or GIT_PASSWORD environment variables are not set")
+			os.Exit(1)
+		}
+		// create the basic auth
+		authWithPassword := &http.BasicAuth{
+			Username: username,
+			Password: password,
+		}
+		err = worktree.Pull(&git.PullOptions{Auth: authWithPassword})
+		if err != nil && err != git.NoErrAlreadyUpToDate {
+			fmt.Println(colors.RenderColor("red", "Failed to pull changes:"), err)
+			log.CheckIfError(err)
+			os.Exit(1)
+		}
 	}
 
+	fmt.Println(colors.RenderColor("green", "Changes pulled successfully"))
 	// get the remote
 	remote, err := repo.Remote("origin")
 	if err != nil {
@@ -92,9 +123,42 @@ func PushAll() {
 		Auth:       auth,
 		Progress:   os.Stdout,
 	})
+
 	if err != nil {
-		fmt.Println(colors.RenderColor("red", "Failed to push to remote repository:"), err)
-		os.Exit(1)
+		fmt.Println(colors.RenderColor("yellow", "SSH submission failed: "), err)
+		fmt.Println(colors.RenderColor("yellow", "Trying to push with username and password..."), err)
+		formData := form.FormProps{
+			Message:      "Enter the following information:",
+			Field:        "username",
+			Field2:       "password",
+			FieldLength:  8,
+			Field2Length: 8,
+		}
+		username, password, err := form.FormInput(formData)
+		if err != nil {
+			fmt.Println(colors.RenderColor("red", "Failed to get username and password: "), err)
+			os.Exit(1)
+		}
+		if username == "" || password == "" {
+			fmt.Println("GIT_USERNAME and/or GIT_PASSWORD environment variables are not set")
+			os.Exit(1)
+		}
+		// create the basic auth
+		authWithPassword := &http.BasicAuth{
+			Username: username,
+			Password: password,
+		}
+
+		err = remote.Push(&git.PushOptions{
+			RemoteName: remote.Config().Name,
+			RemoteURL:  remote.Config().URLs[0],
+			Auth:       authWithPassword,
+			Progress:   os.Stdout,
+		})
+		if err != nil {
+			fmt.Println(colors.RenderColor("red", "Failed to push to remote repository:"), err)
+			os.Exit(1)
+		}
 	}
 
 	fmt.Println(colors.RenderColor("green", "Pushed changes successfully"))

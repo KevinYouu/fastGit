@@ -6,7 +6,6 @@ import (
 
 	"github.com/KevinYouu/fastGit/functions/colors"
 	"github.com/KevinYouu/fastGit/functions/confirm"
-	"github.com/KevinYouu/fastGit/functions/form"
 	"github.com/go-git/go-git/v5"
 )
 
@@ -29,12 +28,7 @@ func GetRemotes() []*git.Remote {
 		fmt.Println("No remotes found")
 		data := confirm.Confirm("Add a remote?")
 		if data {
-			remoteName, remoteUrl, err := form.FormInput()
-			if err != nil {
-				fmt.Println("❌ line 38 err ➡️", err)
-				os.Exit(1)
-			}
-			Add(remoteName, remoteUrl)
+			Add()
 		} else {
 			os.Exit(0)
 		}

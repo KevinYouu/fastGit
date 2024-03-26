@@ -11,8 +11,21 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-func FormInput() (string, string, error) {
-	p := tea.NewProgram(initialModel())
+// "Enter the following information:",
+// inputStyle.Width(11).Render("Remote name"),
+// m.inputs[name].View(),
+// inputStyle.Width(11).Render("Remote url"),
+
+type FormProps struct {
+	Message      string
+	Field        string
+	Field2       string
+	FieldLength  int
+	Field2Length int
+}
+
+func FormInput(props FormProps) (string, string, error) {
+	p := tea.NewProgram(initialModel(props))
 
 	if data, err := p.Run(); err != nil {
 		log.Fatal(err)
@@ -44,6 +57,7 @@ var (
 type model struct {
 	inputs  []textinput.Model
 	focused int
+	props   FormProps
 	err     error
 }
 
@@ -65,7 +79,7 @@ func urlValidator(s string) error {
 	return nil
 }
 
-func initialModel() model {
+func initialModel(props FormProps) model {
 	var inputs []textinput.Model = make([]textinput.Model, 2)
 	inputs[name] = textinput.New()
 	inputs[name].Placeholder = "origin"
@@ -84,6 +98,7 @@ func initialModel() model {
 		inputs:  inputs,
 		focused: 0,
 		err:     nil,
+		props:   props,
 	}
 }
 
@@ -128,13 +143,14 @@ func (m model) View() string {
 	return fmt.Sprintf(`%s
 %s: %s
 %s: %s
-`,
-		colors.RenderColor("white", "Enter the following information:"),
-		inputStyle.Width(11).Render("Remote name"),
+%s`,
+		colors.RenderColor("white", m.props.Message),
+		inputStyle.Width(m.props.FieldLength).Render(m.props.Field),
 		m.inputs[name].View(),
-		inputStyle.Width(11).Render("Remote url"),
+		inputStyle.Width(m.props.Field2Length).Render(m.props.Field2),
 		m.inputs[url].View(),
-	) + "\n"
+		"\n",
+	)
 }
 
 // nextInput focuses the next input field

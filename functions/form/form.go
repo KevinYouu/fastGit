@@ -143,13 +143,12 @@ func (m model) View() string {
 	return fmt.Sprintf(`%s
 %s: %s
 %s: %s
-%s`,
+`,
 		colors.RenderColor("white", m.props.Message),
 		inputStyle.Width(m.props.FieldLength).Render(m.props.Field),
 		m.inputs[name].View(),
 		inputStyle.Width(m.props.Field2Length).Render(m.props.Field2),
 		m.inputs[url].View(),
-		"\n",
 	)
 }
 

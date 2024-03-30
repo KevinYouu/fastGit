@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/KevinYouu/fastGit/functions/command"
+	"github.com/KevinYouu/fastGit/git-functions/clone"
 	"github.com/KevinYouu/fastGit/git-functions/push"
 	"github.com/KevinYouu/fastGit/git-functions/remote"
 	"github.com/KevinYouu/fastGit/git-functions/status"
@@ -19,6 +20,8 @@ func main() {
 	}
 
 	switch args[1] {
+	case "c":
+		clone.Clone()
 	case "pa":
 		push.PushAll()
 	case "ps":

@@ -80,6 +80,8 @@ fi
 
 echo "Installation completed successfully"
 
+rm "$file"
+
 SHELL_TYPE=$(echo "$SHELL" | awk -F/ '{print $NF}')
 
 case $SHELL_TYPE in

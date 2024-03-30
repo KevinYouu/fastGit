@@ -5,34 +5,19 @@ import (
 	"os"
 
 	"github.com/KevinYouu/fastGit/functions/colors"
-	"github.com/KevinYouu/fastGit/functions/confirm"
-	"github.com/go-git/go-git/v5"
+	"github.com/KevinYouu/fastGit/functions/command"
 )
 
-func GetRemotes() []*git.Remote {
-	repoPath := "."
-
-	// open the repository
-	repo, err := git.PlainOpen(repoPath)
+func GetRemotes() {
+	addlog, err := command.RunCommand("git", "remote", "-v")
 	if err != nil {
-		fmt.Println(colors.RenderColor("red", "Failed to open repository:"), err)
+		fmt.Println(colors.RenderColor("red", "Failed to get remotes: "+err.Error()))
 		os.Exit(1)
 	}
 
-	remotes, err := repo.Remotes()
-	if err != nil {
-		fmt.Println("Failed to get remotes:", err)
+	if addlog == "" {
+		fmt.Println(colors.RenderColor("red", "No remotes found."))
 		os.Exit(1)
 	}
-	if len(remotes) == 0 {
-		fmt.Println("No remotes found")
-		data := confirm.Confirm("Add a remote?")
-		if data {
-			Add()
-		} else {
-			os.Exit(0)
-		}
-	}
-
-	return remotes
+	fmt.Println(addlog)
 }

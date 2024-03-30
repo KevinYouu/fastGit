@@ -25,6 +25,8 @@ func main() {
 		push.PushSelected()
 	case "ra":
 		remote.Add()
+	case "rv":
+		remote.GetRemotes()
 	case "t":
 		tag.IncrementTagVersion()
 	case "s":

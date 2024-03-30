@@ -60,6 +60,4 @@ More features will be added soon......
 
 [go](https://github.com/golang/go)
 
-[go-git](https://github.com/go-git/go-git)
-
 [bubbletea](github.com/charmbracelet/bubbletea)

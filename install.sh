@@ -4,6 +4,13 @@
 # Github: https://github.com/KevinYouu/fastGit
 
 repo="KevinYouu/fastGit"
+# 检查是否已安装 git
+if ! command -v git &>/dev/null; then
+    echo "git is not installed. Please install git first."
+    echo "https://git-scm.com/downloads"
+    exit
+fi
+
 version=$(curl -s https://api.github.com/repos/"$repo"/releases/latest | grep 'tag_name' | cut -d\" -f4)
 echo "latest version: $version"
 

@@ -15,7 +15,6 @@ import (
 
 // CreateAndPushTag 创建标签并推送到远程仓库
 func CreateAndPushTag() {
-	commitMessage := input.Input("Enter your commit message: \n", "tag commit message", "\n(esc to quit)")
 
 	latestVersion, err := GetLatestTag()
 	if err != nil {
@@ -24,7 +23,10 @@ func CreateAndPushTag() {
 	}
 	newVersion := incrementVersion(latestVersion)
 
-	cmd := exec.Command("git", "tag", "-a", newVersion, "-m", commitMessage)
+	version := input.Input("Enter your version: ", "tag commit message", "(esc to quit)", newVersion)
+	commitMessage := input.Input("Enter your commit message: ", "tag commit message", "(esc to quit)", "")
+
+	cmd := exec.Command("git", "tag", "-a", version, "-m", commitMessage)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Println(string(output), colors.RenderColor("red", "Failed to create tag: "+string(output)))

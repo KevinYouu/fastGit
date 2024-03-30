@@ -8,9 +8,9 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-// Input function starts a new input program with a provided prompt, placeholder,and exit prompt.
-func Input(prompt, placeholder, exitPrompt string) string {
-	p := tea.NewProgram(initialModel(prompt, placeholder, exitPrompt))
+// Input function starts a new input program with a provided prompt, placeholder, and exit prompt.
+func Input(prompt, placeholder, exitPrompt, defaultValue string) string {
+	p := tea.NewProgram(initialModel(prompt, placeholder, exitPrompt, defaultValue))
 	if data, err := p.Run(); err != nil {
 		log.Fatal(err)
 		return ""
@@ -33,13 +33,16 @@ type model struct {
 	quitting   bool
 }
 
-// initialModel function initializes a new model with the provided prompt, placeholder,and exit prompt.
-func initialModel(prompt, placeholder, quitPrompt string) model {
+// initialModel function initializes a new model with the provided prompt, placeholder, and exit prompt.
+func initialModel(prompt, placeholder, quitPrompt, defaultValue string) model {
 	ti := textinput.New()
 	ti.Placeholder = placeholder // Set input placeholder
 	ti.Focus()                   // Set input focus
 	ti.CharLimit = 156           // Set input character limit
 	ti.Width = 60                // Set input width
+
+	// Set default value
+	ti.SetValue(defaultValue)
 
 	// Return the initialized model, including the input model and prompt
 	return model{
@@ -87,5 +90,5 @@ func (m model) View() string {
 		m.prompt,           // Display the prompt
 		m.textInput.View(), // Display the input field
 		m.quitPrompt,       // Display the exit prompt
-	) + "\n"
+	)
 }

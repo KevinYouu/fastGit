@@ -36,7 +36,7 @@ func PushSelected() {
 		os.Exit(0)
 	}
 	suffix := choose.Choose([]string{"fix", "feat", "refactor", "style", "chore", "docs", "test", "revert"})
-	commitMessage := input.Input("Enter your commit message: \n", "commit message", "\n(esc to quit)")
+	commitMessage := input.Input("Enter your commit message: ", "commit message", "(esc to quit)", suffix+": ")
 
 	log, err := command.RunCommand("git", "pull")
 	if err != nil {
@@ -53,7 +53,7 @@ func PushSelected() {
 	}
 	fmt.Println(addLog, colors.RenderColor("green", "Files added successfully.\n"))
 
-	commLog, err := command.RunCommand("git", "commit", "-m", suffix+" "+commitMessage)
+	commLog, err := command.RunCommand("git", "commit", "-m", commitMessage)
 	if err != nil {
 		fmt.Println(colors.RenderColor("red", "Failed to commit: "+err.Error()))
 		return

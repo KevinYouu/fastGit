@@ -9,7 +9,7 @@ import (
 )
 
 func Clone() {
-	cloneURL := input.Input("Enter the URL of the repository you want to clone: \n", "clone url", "\n(esc to quit)")
+	cloneURL := input.Input("Enter the URL of the repository you want to clone: ", "clone url", "(esc to quit)", "")
 
 	cmd := exec.Command("git", "clone", cloneURL)
 	output, err := cmd.CombinedOutput()

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/KevinYouu/fastGit/functions/command"
 	"github.com/KevinYouu/fastGit/git-functions/clone"
 	"github.com/KevinYouu/fastGit/git-functions/push"
 	"github.com/KevinYouu/fastGit/git-functions/remote"
@@ -34,13 +33,6 @@ func main() {
 		tag.CreateAndPushTag()
 	case "s":
 		status.Status()
-	case "a":
-		log, err := command.RunCommand("git", "status")
-		if err != nil {
-			fmt.Println("error executing git status command:", err)
-			os.Exit(1)
-		}
-		fmt.Println(log)
 	default:
 		fmt.Println("unknown command:", args[1])
 		os.Exit(1)

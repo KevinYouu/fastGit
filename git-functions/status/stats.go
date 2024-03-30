@@ -62,9 +62,24 @@ func Status() {
 		fmt.Println(colors.RenderColor("red", "Failed to get file statuses:"), err)
 		os.Exit(1)
 	}
+
+	if len(fileStatuss) == 0 {
+		fmt.Println(colors.RenderColor("blue", "No files changed."))
+		os.Exit(0)
+	}
+
 	fmt.Println("File statuses:")
 	for _, file := range fileStatuss {
 		color := statusColor(file.Status)
 		fmt.Println(colors.RenderColor(color, file.Status+" "+file.Path))
 	}
 }
+
+// func Status() {
+// 	log, err := command.RunCommand("git", "status")
+// 	if err != nil {
+// 		fmt.Println("error executing git status command:", err)
+// 		os.Exit(1)
+// 	}
+// 	fmt.Println(log)
+// }

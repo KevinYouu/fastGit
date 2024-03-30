@@ -41,9 +41,20 @@ fastGit pa
 ### Features
 
 - [x] `fastGit pa`, submit all changes in the working directory
+
+- [x] `fastGit ps`, submit some changes in the working directory
+
+- [x] `fastGit c`, clone a repository
+
+- [x] `fastGit t`, create and push a tag
+
+- [x] `fastGit s`, check the status of the repository
+
+- [x] `fastGit rv`, get all remote repositories
+
 - [x] `fastGit ra`, add a remote repository
-- [ ] `fastGit ps`, submit some changes in the working directory
-- [ ] `fastGit rb`, delete a remote repository
+
+More features will be added soon......
 
 ### Thanks to the following open source projects
 

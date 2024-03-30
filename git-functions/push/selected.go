@@ -3,10 +3,10 @@ package push
 import (
 	"fmt"
 	"os"
-	"os/exec"
 
 	"github.com/KevinYouu/fastGit/functions/choose"
 	"github.com/KevinYouu/fastGit/functions/colors"
+	"github.com/KevinYouu/fastGit/functions/command"
 	"github.com/KevinYouu/fastGit/functions/input"
 	"github.com/KevinYouu/fastGit/functions/multipleChoice"
 	"github.com/KevinYouu/fastGit/git-functions/status"
@@ -27,44 +27,40 @@ func PushSelected() {
 	}
 
 	data := multipleChoice.MultipleChoice(selectedFiles)
+	if len(data) == 0 {
+		fmt.Println(colors.RenderColor("red", "No files selected."))
+		os.Exit(0)
+	}
 
-	cmd := exec.Command("git", "pull")
-	err = cmd.Run()
+	log, err := command.RunCommand("git", "pull")
 	if err != nil {
 		fmt.Println(colors.RenderColor("red", "Failed to pull: "+err.Error()))
-		os.Exit(1)
+		return
 	} else {
-		fmt.Println(colors.RenderColor("green", "Pulled successfully."))
+		fmt.Println(log, colors.RenderColor("green", "Pulled successfully.\n"))
 	}
 
 	suffix := choose.Choose([]string{"fix", "feat", "docs", "style", "refactor", "test", "chore", "revert"})
 	commitMessage := input.Input("Enter your commit message: \n", "commit message", "\n(esc to quit)")
 
-	cmd = exec.Command("git", append([]string{"add"}, data...)...)
-	err = cmd.Run()
+	addLog, err := command.RunCommand("git", append([]string{"add"}, data...)...)
 	if err != nil {
-		// fmt.Println("Error executing git add command:", err)
 		fmt.Println(colors.RenderColor("red", "Failed to add files: "+err.Error()))
 		return
 	}
-	fmt.Println(colors.RenderColor("green", "Files added successfully."))
+	fmt.Println(addLog, colors.RenderColor("green", "Files added successfully.\n"))
 
-	cmd = exec.Command("git", "commit", "-m", suffix+" "+commitMessage)
-	err = cmd.Run()
+	commLog, err := command.RunCommand("git", "commit", "-m", suffix+" "+commitMessage)
 	if err != nil {
 		fmt.Println(colors.RenderColor("red", "Failed to commit: "+err.Error()))
 		return
 	}
+	fmt.Println(commLog, colors.RenderColor("green", "Commit successful.\n"))
 
-	fmt.Println(colors.RenderColor("green", "Commit successful."))
-
-	// 执行 git push 命令
-	cmd = exec.Command("git", "push")
-	err = cmd.Run()
+	pushLog, err := command.RunCommand("git", "push")
 	if err != nil {
 		fmt.Println(colors.RenderColor("red", "Failed to push: "+err.Error()))
 		return
 	}
-
-	fmt.Println(colors.RenderColor("green", "Push successful."))
+	fmt.Println(pushLog, colors.RenderColor("green", "Push successful."))
 }

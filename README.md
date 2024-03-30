@@ -8,7 +8,18 @@ fastGit is a tool that helps you quickly submit code with a command line interfa
 
 ### How to use
 
-#### Install fastGit
+#### 1. Install Git
+
+> Project dependencies on Git, please install Git first
+
+```bash
+# Debian/Ubuntu
+sudo apt install git
+# macOS
+brew install git
+```
+
+#### 2. Install fastGit
 
 ```bash
 # Linux/macOS
@@ -21,7 +32,7 @@ or
 wget -qO- https://github.com/KevinYouu/fastGit/install.sh | bash
 ```
 
-#### Run
+#### 3. Run
 
 ```bash
 fastGit pa

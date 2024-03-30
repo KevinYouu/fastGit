@@ -2,14 +2,28 @@ package push
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/KevinYouu/fastGit/functions/choose"
 	"github.com/KevinYouu/fastGit/functions/colors"
 	"github.com/KevinYouu/fastGit/functions/command"
 	"github.com/KevinYouu/fastGit/functions/input"
+	"github.com/KevinYouu/fastGit/git-functions/status"
 )
 
 func PushAll() {
+	fileStatuss, err := status.GetFileStatuses()
+	if err != nil {
+		fmt.Println(colors.RenderColor("red", "Failed to get file statuses:"), err)
+		os.Exit(1)
+	}
+	if len(fileStatuss) == 0 {
+		fmt.Println(colors.RenderColor("blue", "No files to push."))
+		os.Exit(0)
+	}
+	suffix := choose.Choose([]string{"fix", "feat", "refactor", "style", "chore", "docs", "test", "revert"})
+	commitMessage := input.Input("Enter your commit message: \n", "commit message", "\n(esc to quit)")
+
 	log, err := command.RunCommand("git", "pull")
 	if err != nil {
 		fmt.Println(colors.RenderColor("red", "Failed to pull: "+err.Error()))
@@ -17,9 +31,6 @@ func PushAll() {
 	} else {
 		fmt.Println(log, colors.RenderColor("green", "Pulled successfully.\n"))
 	}
-
-	suffix := choose.Choose([]string{"fix", "feat", "docs", "style", "refactor", "test", "chore", "revert"})
-	commitMessage := input.Input("Enter your commit message: \n", "commit message", "\n(esc to quit)")
 
 	addlog, err := command.RunCommand("git", "add", "-A")
 	if err != nil {

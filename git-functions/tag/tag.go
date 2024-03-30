@@ -41,7 +41,6 @@ func CreateAndPushTag() {
 	fmt.Println(string(output), colors.RenderColor("green", "Tag pushed successfully."))
 }
 
-// Basic example of how to list tags.
 // GetLatestTag 获取最新的标签版本号，如果没有标签则返回 "0.0.0"
 func GetLatestTag() (string, error) {
 	cmd := exec.Command("git", "describe", "--tags", "--abbrev=0")

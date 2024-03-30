@@ -8,7 +8,18 @@ fastGit 是一个帮助你快速提交代码的命令行工具,支持 Linux、Ma
 
 ### 如何使用
 
-#### 安装 fastGit
+#### 1. 安装 Git
+
+> 项目依赖于 Git, 请先安装 Git
+
+```bash
+# Debian/Ubuntu
+sudo apt install git
+# macOS
+brew install git
+```
+
+#### 2. 安装 fastGit
 
 ```bash
 # Linux/macOS
@@ -21,7 +32,7 @@ curl -sSL https://github.com/KevinYouu/fastGit/install.sh | bash
 wget -qO- https://github.com/KevinYouu/fastGit/install.sh | bash
 ```
 
-#### 运行
+#### 3. 运行
 
 ```bash
 fastGit pa

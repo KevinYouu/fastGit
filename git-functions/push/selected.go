@@ -18,6 +18,10 @@ func PushSelected() {
 		fmt.Println(colors.RenderColor("red", "Failed to get file statuses:"), err)
 		os.Exit(1)
 	}
+	if len(fileStatuss) == 0 {
+		fmt.Println(colors.RenderColor("blue", "No files to push."))
+		os.Exit(0)
+	}
 
 	var selectedFiles []string
 	for _, fileStatus := range fileStatuss {
@@ -31,6 +35,8 @@ func PushSelected() {
 		fmt.Println(colors.RenderColor("red", "No files selected."))
 		os.Exit(0)
 	}
+	suffix := choose.Choose([]string{"fix", "feat", "refactor", "style", "chore", "docs", "test", "revert"})
+	commitMessage := input.Input("Enter your commit message: \n", "commit message", "\n(esc to quit)")
 
 	log, err := command.RunCommand("git", "pull")
 	if err != nil {
@@ -39,9 +45,6 @@ func PushSelected() {
 	} else {
 		fmt.Println(log, colors.RenderColor("green", "Pulled successfully.\n"))
 	}
-
-	suffix := choose.Choose([]string{"fix", "feat", "docs", "style", "refactor", "test", "chore", "revert"})
-	commitMessage := input.Input("Enter your commit message: \n", "commit message", "\n(esc to quit)")
 
 	addLog, err := command.RunCommand("git", append([]string{"add"}, data...)...)
 	if err != nil {

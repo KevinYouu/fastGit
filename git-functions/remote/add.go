@@ -3,23 +3,13 @@ package remote
 import (
 	"fmt"
 	"os"
+	"os/exec"
 
 	"github.com/KevinYouu/fastGit/functions/colors"
 	"github.com/KevinYouu/fastGit/functions/form"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/config"
 )
 
 func Add() {
-	repoPath := "."
-
-	// open the repository
-	repo, err := git.PlainOpen(repoPath)
-	if err != nil {
-		fmt.Println("Failed to open repository:", err)
-		os.Exit(1)
-	}
-
 	form_props := form.FormProps{
 		Message:      "Enter the following information:",
 		Field:        "remote name",
@@ -33,15 +23,11 @@ func Add() {
 		os.Exit(1)
 	}
 
-	// create the remote
-	_, err = repo.CreateRemote(&config.RemoteConfig{
-		Name: remoteName,
-		URLs: []string{remoteUrl},
-	})
+	cmd := exec.Command("git", "remote", "add", remoteName, remoteUrl)
+	_, err = cmd.CombinedOutput()
 	if err != nil {
-		fmt.Println(colors.RenderColor("red", "Failed to add remote repository:"), err)
-		os.Exit(1)
+		fmt.Println(colors.RenderColor("red", "Failed to add remote: "+err.Error()))
+		return
 	}
-
-	fmt.Println("Remote repository " + colors.RenderColor("green", remoteName+" ") + colors.RenderColor("green", remoteUrl) + " added successfully")
+	fmt.Println(colors.RenderColor("green", "Remote added successfully."))
 }

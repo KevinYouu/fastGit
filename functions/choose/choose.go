@@ -10,12 +10,11 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-var choices = []string{"fix", "feat", "docs", "style", "refactor", "test", "chore", "revert"}
-
 type model struct {
 	cursor   int
 	choice   string
 	quitting bool
+	choices  []string // Choices passed as a parameter
 }
 
 func (m model) Init() tea.Cmd {
@@ -33,19 +32,19 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter", " ":
 			m.quitting = true
 			// Send the choice on the channel and exit.
-			m.choice = choices[m.cursor]
+			m.choice = m.choices[m.cursor]
 			return m, tea.Quit
 
 		case "down", "j":
 			m.cursor++
-			if m.cursor >= len(choices) {
+			if m.cursor >= len(m.choices) {
 				m.cursor = 0
 			}
 
 		case "up", "k":
 			m.cursor--
 			if m.cursor < 0 {
-				m.cursor = len(choices) - 1
+				m.cursor = len(m.choices) - 1
 			}
 		}
 	}
@@ -57,11 +56,11 @@ func (m model) View() string {
 	s := strings.Builder{}
 	s.WriteString("What kind of Bubble Tea would you like to order?\n")
 
-	for i := 0; i < len(choices); i++ {
+	for i := 0; i < len(m.choices); i++ {
 		if m.cursor == i {
-			s.WriteString(colors.RenderColor("blue", "◉ "+choices[i]))
+			s.WriteString(colors.RenderColor("blue", "◉ "+m.choices[i]))
 		} else {
-			s.WriteString(colors.RenderColor("white", "○ "+choices[i]))
+			s.WriteString(colors.RenderColor("white", "○ "+m.choices[i]))
 		}
 		s.WriteString("\n")
 	}
@@ -73,8 +72,8 @@ func (m model) View() string {
 	return s.String()
 }
 
-func Choose() string {
-	p := tea.NewProgram(model{})
+func Choose(choices []string) string {
+	p := tea.NewProgram(model{choices: choices})
 
 	// Run returns the model as a tea.Model.
 	m, err := p.Run()

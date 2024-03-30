@@ -25,7 +25,7 @@ func main() {
 	case "t":
 		tag.IncrementTagVersion()
 	case "s":
-		status.Status()
+		status.GetFileStatuses()
 	default:
 		fmt.Println("unknown command:", args[1])
 		os.Exit(1)

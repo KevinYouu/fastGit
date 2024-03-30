@@ -17,7 +17,7 @@ import (
 func PushAll() {
 	repoPath := "."
 
-	suffix := choose.Choose()
+	suffix := choose.Choose([]string{"fix", "feat", "docs", "style", "refactor", "test", "chore", "revert"})
 	data := input.Input("Enter your commit message: \n", "commit message", "\n(esc to quit)")
 
 	// open the repository

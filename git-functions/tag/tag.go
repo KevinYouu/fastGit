@@ -4,61 +4,55 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"regexp"
-	"sort"
 	"strconv"
+	"strings"
 
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/config"
-	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/go-git/go-git/v5/plumbing/object"
-	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
+	"github.com/KevinYouu/fastGit/functions/colors"
+	"github.com/KevinYouu/fastGit/functions/input"
 )
 
-// 创建自增tag
-func IncrementTagVersion() {
-	latestVersion := getLatestTag()
+// CreateAndPushTag 创建标签并推送到远程仓库
+func CreateAndPushTag() {
+	commitMessage := input.Input("Enter your commit message: \n", "tag commit message", "\n(esc to quit)")
+
+	latestVersion, err := GetLatestTag()
+	if err != nil {
+		log.Printf("get latest tag error: %s", err)
+		return
+	}
 	newVersion := incrementVersion(latestVersion)
 
-	fmt.Println("🚀 line 23 newVersion ➡️", newVersion)
+	cmd := exec.Command("git", "tag", "-a", newVersion, "-m", commitMessage)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println(string(output), colors.RenderColor("red", "Failed to create tag: "+string(output)))
+		return
+	}
+	fmt.Println(string(output), colors.RenderColor("green", "Tag created successfully."))
+
+	cmd = exec.Command("git", "push", "origin", newVersion)
+	output, err = cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println(string(output), colors.RenderColor("red", "Failed to push tag: "+string(output)))
+		return
+	}
+	fmt.Println(string(output), colors.RenderColor("green", "Tag pushed successfully."))
 }
 
 // Basic example of how to list tags.
-func getLatestTag() string {
-	// 打开本地仓库
-	repo, err := git.PlainOpen(".")
+// GetLatestTag 获取最新的标签版本号，如果没有标签则返回 "0.0.0"
+func GetLatestTag() (string, error) {
+	cmd := exec.Command("git", "describe", "--tags", "--abbrev=0")
+	output, err := cmd.Output()
 	if err != nil {
-		fmt.Println("Failed to open repository:", err)
-		os.Exit(1)
+		if exitError, ok := err.(*exec.ExitError); ok && exitError.ExitCode() == 128 {
+			return "0.0.0", nil
+		}
+		return "", err
 	}
-
-	// 获取标签列表
-	tagRefs, err := repo.Tags()
-	if err != nil {
-		fmt.Println("Failed to get tags:", err)
-		os.Exit(1)
-	}
-
-	// 遍历标签列表，获取标签名称
-	var tags []string
-	err = tagRefs.ForEach(func(tagRef *plumbing.Reference) error {
-		tags = append(tags, tagRef.Name().Short())
-		return nil
-	})
-	if err != nil {
-		fmt.Println("Failed to iterate over tags:", err)
-		os.Exit(1)
-	}
-
-	// 将标签名称按照语义化版本进行排序
-	sort.Strings(tags)
-
-	// 获取最新的标签版本号
-	latestTag := tags[len(tags)-1]
-
-	fmt.Println("Latest tag version:", latestTag)
-
-	return latestTag
+	return strings.TrimSpace(string(output)), nil
 }
 
 func incrementVersion(currentVersion string) string {
@@ -93,83 +87,4 @@ func incrementVersion(currentVersion string) string {
 	// 重新构建版本号字符串
 	newVersion := fmt.Sprintf("%d.%d.%d", major, minor, patch)
 	return newVersion
-}
-
-func tagExists(tag string, r *git.Repository) bool {
-	tagFoundErr := "tag was found"
-	tags, err := r.TagObjects()
-	if err != nil {
-		log.Printf("get tags error: %s", err)
-		return false
-	}
-	res := false
-	err = tags.ForEach(func(t *object.Tag) error {
-		if t.Name == tag {
-			res = true
-			return fmt.Errorf(tagFoundErr)
-		}
-		return nil
-	})
-	if err != nil && err.Error() != tagFoundErr {
-		log.Printf("iterate tags error: %s", err)
-		return false
-	}
-	return res
-}
-
-func setTag(r *git.Repository, tag string) (bool, error) {
-	if tagExists(tag, r) {
-		log.Printf("tag %s already exists", tag)
-		return false, nil
-	}
-	log.Printf("Set tag %s", tag)
-	h, err := r.Head()
-	if err != nil {
-		log.Printf("get HEAD error: %s", err)
-		return false, err
-	}
-	_, err = r.CreateTag(tag, h.Hash(), &git.CreateTagOptions{
-		Message: tag,
-	})
-
-	if err != nil {
-		log.Printf("create tag error: %s", err)
-		return false, err
-	}
-
-	return true, nil
-}
-
-func publicKey(filePath string) (*ssh.PublicKeys, error) {
-	var publicKey *ssh.PublicKeys
-	sshKey, _ := os.ReadFile(filePath)
-	publicKey, err := ssh.NewPublicKeys("git", []byte(sshKey), "")
-	if err != nil {
-		return nil, err
-	}
-	return publicKey, err
-}
-
-func pushTags(r *git.Repository, publicKeyPath string) error {
-
-	auth, _ := publicKey(publicKeyPath)
-
-	po := &git.PushOptions{
-		RemoteName: "origin",
-		Progress:   os.Stdout,
-		RefSpecs:   []config.RefSpec{config.RefSpec("refs/tags/*:refs/tags/*")},
-		Auth:       auth,
-	}
-	err := r.Push(po)
-
-	if err != nil {
-		if err == git.NoErrAlreadyUpToDate {
-			log.Print("origin remote was up to date, no push done")
-			return nil
-		}
-		log.Printf("push to remote origin error: %s", err)
-		return err
-	}
-
-	return nil
 }

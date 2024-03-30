@@ -31,7 +31,7 @@ func main() {
 	case "rv":
 		remote.GetRemotes()
 	case "t":
-		tag.IncrementTagVersion()
+		tag.CreateAndPushTag()
 	case "s":
 		status.Status()
 	case "a":

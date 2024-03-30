@@ -11,11 +11,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// "Enter the following information:",
-// inputStyle.Width(11).Render("Remote name"),
-// m.inputs[name].View(),
-// inputStyle.Width(11).Render("Remote url"),
-
 type FormProps struct {
 	Message      string
 	Field        string

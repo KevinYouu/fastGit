@@ -31,38 +31,40 @@ func PushSelected() {
 	cmd := exec.Command("git", "pull")
 	err = cmd.Run()
 	if err != nil {
-		fmt.Println("Error executing git pull command:", err)
+		fmt.Println(colors.RenderColor("red", "Failed to pull: "+err.Error()))
+		os.Exit(1)
 	} else {
-		fmt.Println("Pulled successfully.")
+		fmt.Println(colors.RenderColor("green", "Pulled successfully."))
 	}
+
+	suffix := choose.Choose([]string{"fix", "feat", "docs", "style", "refactor", "test", "chore", "revert"})
+	commitMessage := input.Input("Enter your commit message: \n", "commit message", "\n(esc to quit)")
 
 	cmd = exec.Command("git", append([]string{"add"}, data...)...)
 	err = cmd.Run()
 	if err != nil {
-		fmt.Println("Error executing git add command:", err)
+		// fmt.Println("Error executing git add command:", err)
+		fmt.Println(colors.RenderColor("red", "Failed to add files: "+err.Error()))
 		return
 	}
-
-	fmt.Println("Files added successfully.")
-	suffix := choose.Choose([]string{"fix", "feat", "docs", "style", "refactor", "test", "chore", "revert"})
-	commitMessage := input.Input("Enter your commit message: \n", "commit message", "\n(esc to quit)")
+	fmt.Println(colors.RenderColor("green", "Files added successfully."))
 
 	cmd = exec.Command("git", "commit", "-m", suffix+" "+commitMessage)
 	err = cmd.Run()
 	if err != nil {
-		fmt.Println("Error executing git commit command:", err)
+		fmt.Println(colors.RenderColor("red", "Failed to commit: "+err.Error()))
 		return
 	}
 
-	fmt.Println("Commit successful.")
+	fmt.Println(colors.RenderColor("green", "Commit successful."))
 
 	// 执行 git push 命令
 	cmd = exec.Command("git", "push")
 	err = cmd.Run()
 	if err != nil {
-		fmt.Println("Error executing git push command:", err)
+		fmt.Println(colors.RenderColor("red", "Failed to push: "+err.Error()))
 		return
 	}
 
-	fmt.Println("Push successful.")
+	fmt.Println(colors.RenderColor("green", "Push successful."))
 }

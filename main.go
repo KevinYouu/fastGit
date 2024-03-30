@@ -20,12 +20,14 @@ func main() {
 	switch args[1] {
 	case "pa":
 		push.PushAll()
+	case "ps":
+		push.PushSelected()
 	case "ra":
 		remote.Add()
 	case "t":
 		tag.IncrementTagVersion()
 	case "s":
-		status.GetFileStatuses()
+		status.Status()
 	default:
 		fmt.Println("unknown command:", args[1])
 		os.Exit(1)

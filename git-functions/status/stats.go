@@ -2,6 +2,7 @@ package status
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -52,11 +53,18 @@ func GetFileStatuses() ([]FileStatus, error) {
 		}
 	}
 
+	return files, nil
+}
+
+func Status() {
+	fileStatuss, err := GetFileStatuses()
+	if err != nil {
+		fmt.Println(colors.RenderColor("red", "Failed to get file statuses:"), err)
+		os.Exit(1)
+	}
 	fmt.Println("File statuses:")
-	for _, file := range files {
+	for _, file := range fileStatuss {
 		color := statusColor(file.Status)
 		fmt.Println(colors.RenderColor(color, file.Status+" "+file.Path))
 	}
-
-	return files, nil
 }

@@ -7,7 +7,6 @@ import (
 	"github.com/KevinYouu/fastGit/functions/colors"
 	"github.com/KevinYouu/fastGit/functions/command"
 	"github.com/KevinYouu/fastGit/functions/form"
-	"github.com/KevinYouu/fastGit/functions/multipleChoice"
 	"github.com/KevinYouu/fastGit/git-functions/status"
 )
 
@@ -29,7 +28,14 @@ func PushSelected() {
 		}
 	}
 
-	data := multipleChoice.MultipleChoice(selectedFiles)
+	// data := multipleChoice.MultipleChoice(selectedFiles)
+	data, err := form.MultiSelectForm("Select files to push", selectedFiles)
+	if err != nil {
+		fmt.Println(colors.RenderColor("red", "Failed to get file statuses:"), err)
+		os.Exit(0)
+		return
+	}
+
 	if len(data) == 0 {
 		fmt.Println(colors.RenderColor("red", "No files selected."))
 		os.Exit(0)

@@ -59,3 +59,5 @@ fastGit pa
 [go](https://github.com/golang/go)
 
 [bubbletea](github.com/charmbracelet/bubbletea)
+
+[huh](github.com/charmbracelet/huh)

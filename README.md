@@ -61,3 +61,5 @@ More features will be added soon......
 [go](https://github.com/golang/go)
 
 [bubbletea](github.com/charmbracelet/bubbletea)
+
+[huh](github.com/charmbracelet/huh)

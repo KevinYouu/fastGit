@@ -59,12 +59,12 @@ func PushAll() {
 	}
 	fmt.Println(commLog, colors.RenderColor("green", "Commit successful.\n"))
 
-	log, err := command.RunCommand("git", "pull")
+	pullLog, err := command.RunCommand("git", "pull")
 	if err != nil {
 		fmt.Println(colors.RenderColor("red", "Failed to pull: "+err.Error()))
 		return
 	} else {
-		fmt.Println(log, colors.RenderColor("green", "Pulled successfully.\n"))
+		fmt.Println(pullLog, colors.RenderColor("green", "Pulled successfully.\n"))
 	}
 
 	pushLog, err := command.RunCommand("git", "push")

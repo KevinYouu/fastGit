@@ -42,17 +42,6 @@ func PushSelected() {
 	}
 	// suffix := choose.Choose([]string{"fix", "feat", "refactor", "style", "chore", "docs", "test", "revert"})
 	// commitMessage := input.Input("Enter your commit message: ", "commit message", "(esc to quit)", suffix+": ")
-	options := []form.Option{
-		{Label: "fix", Value: "fix"},
-		{Label: "feat", Value: "feat"},
-		{Label: "refactor", Value: "refactor"},
-		{Label: "chore", Value: "chore"},
-		{Label: "build", Value: "build"},
-		{Label: "revert", Value: "revert"},
-		{Label: "style", Value: "style"},
-		{Label: "docs", Value: "docs"},
-		{Label: "test", Value: "test"},
-	}
 
 	_, suffix, err := form.SelectForm(options)
 	if err != nil {

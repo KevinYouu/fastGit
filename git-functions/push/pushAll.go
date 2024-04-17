@@ -10,6 +10,18 @@ import (
 	"github.com/KevinYouu/fastGit/git-functions/status"
 )
 
+var options = []form.Option{
+	{Label: "fix", Value: "fix"},
+	{Label: "feat", Value: "feat"},
+	{Label: "refactor", Value: "refactor"},
+	{Label: "chore", Value: "chore"},
+	{Label: "build", Value: "build"},
+	{Label: "revert", Value: "revert"},
+	{Label: "style", Value: "style"},
+	{Label: "docs", Value: "docs"},
+	{Label: "test", Value: "test"},
+}
+
 func PushAll() {
 	fileStatuss, err := status.GetFileStatuses()
 	if err != nil {
@@ -21,18 +33,6 @@ func PushAll() {
 		os.Exit(0)
 	}
 	// suffix := choose.Choose([]string{"fix", "feat", "refactor", "style", "chore", "docs", "test", "revert"})
-	options := []form.Option{
-		{Label: "fix", Value: "fix"},
-		{Label: "feat", Value: "feat"},
-		{Label: "refactor", Value: "refactor"},
-		{Label: "chore", Value: "chore"},
-		{Label: "build", Value: "build"},
-		{Label: "revert", Value: "revert"},
-		{Label: "style", Value: "style"},
-		{Label: "docs", Value: "docs"},
-		{Label: "test", Value: "test"},
-	}
-
 	_, suffix, err := form.SelectForm(options)
 	if err != nil {
 		fmt.Println(err)

@@ -45,7 +45,7 @@ func PushAll() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	spinner.Spinner("Loading", "done", func() {
+	spinner.Spinner("Pushing...", "done", func() {
 		addlog, err := command.RunCommand("git", "add", "-A")
 		if err != nil {
 			fmt.Println(colors.RenderColor("red", "Failed to add files: "+err.Error()))

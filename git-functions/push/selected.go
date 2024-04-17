@@ -56,7 +56,7 @@ func PushSelected() {
 		os.Exit(1)
 	}
 
-	spinner.Spinner("Loading", "done", func() {
+	spinner.Spinner("Pushing...", "done", func() {
 		addLog, err := command.RunCommand("git", append([]string{"add"}, data...)...)
 		if err != nil {
 			fmt.Println(colors.RenderColor("red", "Failed to add files: "+err.Error()))

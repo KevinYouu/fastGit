@@ -7,6 +7,7 @@ import (
 	"github.com/KevinYouu/fastGit/functions/colors"
 	"github.com/KevinYouu/fastGit/functions/command"
 	"github.com/KevinYouu/fastGit/functions/form"
+	"github.com/KevinYouu/fastGit/functions/spinner"
 	"github.com/KevinYouu/fastGit/git-functions/status"
 )
 
@@ -44,33 +45,34 @@ func PushAll() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+	spinner.Spinner("Loading", "done", func() {
+		addlog, err := command.RunCommand("git", "add", "-A")
+		if err != nil {
+			fmt.Println(colors.RenderColor("red", "Failed to add files: "+err.Error()))
+			return
+		}
+		fmt.Println(addlog, colors.RenderColor("green", "Files added successfully.\n"))
 
-	addlog, err := command.RunCommand("git", "add", "-A")
-	if err != nil {
-		fmt.Println(colors.RenderColor("red", "Failed to add files: "+err.Error()))
-		return
-	}
-	fmt.Println(addlog, colors.RenderColor("green", "Files added successfully.\n"))
+		commLog, err := command.RunCommand("git", "commit", "-m", commitMessage)
+		if err != nil {
+			fmt.Println(colors.RenderColor("red", "Failed to commit: "+err.Error()))
+			return
+		}
+		fmt.Println(commLog, colors.RenderColor("green", "Commit successful.\n"))
 
-	commLog, err := command.RunCommand("git", "commit", "-m", commitMessage)
-	if err != nil {
-		fmt.Println(colors.RenderColor("red", "Failed to commit: "+err.Error()))
-		return
-	}
-	fmt.Println(commLog, colors.RenderColor("green", "Commit successful.\n"))
+		pullLog, err := command.RunCommand("git", "pull")
+		if err != nil {
+			fmt.Println(colors.RenderColor("red", "Failed to pull: "+err.Error()))
+			return
+		} else {
+			fmt.Println(pullLog, colors.RenderColor("green", "Pulled successfully.\n"))
+		}
 
-	pullLog, err := command.RunCommand("git", "pull")
-	if err != nil {
-		fmt.Println(colors.RenderColor("red", "Failed to pull: "+err.Error()))
-		return
-	} else {
-		fmt.Println(pullLog, colors.RenderColor("green", "Pulled successfully.\n"))
-	}
-
-	pushLog, err := command.RunCommand("git", "push")
-	if err != nil {
-		fmt.Println(colors.RenderColor("red", "Failed to push: "+err.Error()))
-		return
-	}
-	fmt.Println(pushLog, colors.RenderColor("green", "Push successful."))
+		pushLog, err := command.RunCommand("git", "push")
+		if err != nil {
+			fmt.Println(colors.RenderColor("red", "Failed to push: "+err.Error()))
+			return
+		}
+		fmt.Println(pushLog, colors.RenderColor("green", "Push successful."))
+	})
 }

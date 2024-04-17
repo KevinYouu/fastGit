@@ -21,7 +21,7 @@ require (
 	github.com/muesli/reflow v0.3.0 // indirect
 	github.com/muesli/termenv v0.15.2 // indirect
 	github.com/rivo/uniseg v0.4.6 // indirect
-	golang.org/x/sync v0.4.0 // indirect
+	golang.org/x/sync v0.6.0 // indirect
 	golang.org/x/term v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 )
@@ -29,5 +29,6 @@ require (
 require (
 	github.com/charmbracelet/bubbles v0.18.0
 	github.com/charmbracelet/bubbletea v0.25.0
+	github.com/charmbracelet/huh/spinner v0.0.0-20240404200615-66118a2cb3cf
 	golang.org/x/sys v0.18.0 // indirect
 )

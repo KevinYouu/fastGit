@@ -23,13 +23,13 @@ brew install git
 
 ```bash
 # Linux/macOS
-curl -sSL https://github.com/KevinYouu/fastGit/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/KevinYouu/fastGit/main/install.sh | bash
 ```
 
 或者
 
 ```bash
-wget -qO- https://github.com/KevinYouu/fastGit/install.sh | bash
+wget -qO- https://raw.githubusercontent.com/KevinYouu/fastGit/main/install.sh | bash
 ```
 
 #### 3. 运行

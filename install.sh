@@ -59,7 +59,7 @@ else
     exit 1
 fi
 echo "Extracting and installing $file"
-unzip "$file" -d /usr/local/bin/
+unzip -o "$file" -d /usr/local/bin/
 
 if [ $? -eq 0 ]; then
     echo "Extraction successful"

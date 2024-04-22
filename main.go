@@ -33,6 +33,8 @@ func main() {
 		tag.CreateAndPushTag()
 	case "s":
 		status.Status()
+	case "v":
+		version.GetVersion()
 	default:
 		fmt.Println("unknown command:", args[1])
 		os.Exit(1)

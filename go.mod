@@ -3,7 +3,10 @@ module github.com/KevinYouu/fastGit
 go 1.22.2
 
 require (
+	github.com/charmbracelet/bubbles v0.18.0
+	github.com/charmbracelet/bubbletea v0.25.0
 	github.com/charmbracelet/huh v0.3.0
+	github.com/charmbracelet/huh/spinner v0.0.0-20240404200615-66118a2cb3cf
 	github.com/charmbracelet/lipgloss v0.9.1
 )
 
@@ -23,13 +26,7 @@ require (
 	github.com/rivo/uniseg v0.4.6 // indirect
 	github.com/sahilm/fuzzy v0.1.1-0.20230530133925-c48e322e2a8f // indirect
 	golang.org/x/sync v0.6.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/term v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
-)
-
-require (
-	github.com/charmbracelet/bubbles v0.18.0
-	github.com/charmbracelet/bubbletea v0.25.0
-	github.com/charmbracelet/huh/spinner v0.0.0-20240404200615-66118a2cb3cf
-	golang.org/x/sys v0.18.0 // indirect
 )

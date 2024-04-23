@@ -7,6 +7,7 @@ import (
 	"github.com/KevinYouu/fastGit/functions/version"
 
 	"github.com/KevinYouu/fastGit/git-functions/clone"
+	"github.com/KevinYouu/fastGit/git-functions/merge"
 	"github.com/KevinYouu/fastGit/git-functions/push"
 	"github.com/KevinYouu/fastGit/git-functions/remote"
 	"github.com/KevinYouu/fastGit/git-functions/reset"
@@ -39,6 +40,8 @@ func main() {
 		tag.CreateAndPushTag()
 	case "s":
 		status.Status()
+	case "mc":
+		merge.MergeIntoCurrent()
 	case "v":
 		version.GetVersion()
 	default:

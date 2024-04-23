@@ -35,7 +35,13 @@ wget -qO- https://raw.githubusercontent.com/KevinYouu/fastGit/main/install.sh | 
 #### 3. 运行
 
 ```bash
+# 提交工作区全部已更改的文件
 fastGit pa
+```
+
+```bash
+# 提交已选择的文件
+fastGit ps
 ```
 
 ### 功能

@@ -35,7 +35,13 @@ wget -qO- https://raw.githubusercontent.com/KevinYouu/fastGit/main/install.sh | 
 #### 3. Run
 
 ```bash
+# Submit all changed files in the working directory
 fastGit pa
+```
+
+```bash
+# Submit the selected files in the working directory
+fastGit ps
 ```
 
 ### Features

@@ -18,6 +18,7 @@ func main() {
 	args := os.Args
 
 	if len(args) == 1 {
+		version.GetVersion()
 		return
 	}
 

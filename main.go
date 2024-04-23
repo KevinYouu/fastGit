@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/KevinYouu/fastGit/functions/version"
+
 	"github.com/KevinYouu/fastGit/git-functions/clone"
 	"github.com/KevinYouu/fastGit/git-functions/push"
 	"github.com/KevinYouu/fastGit/git-functions/remote"

@@ -6,12 +6,14 @@ import (
 	"github.com/KevinYouu/fastGit/functions/colors"
 )
 
-var Version string
+var Version = "untracked"
 
 func GetVersion() {
 	GetLogo()
+	fmt.Println("Version:", colors.RenderColor("blue", Version))
 	fmt.Println("Github:", colors.RenderColor("blue", "https://github.com/KevinYouu/fastGit"))
 	fmt.Println("Written in Go by", colors.RenderColor("blue", "KevinYouu"))
+	fmt.Println("To know more about me, you can visit my blog:", colors.RenderColor("blue", "https://www.kevnu.com/en-US/about"))
 }
 
 func GetLogo() {
@@ -28,7 +30,7 @@ func GetLogo() {
                   /:/  /       \::/  /                     \::/  /      \/__/
                   \/__/         \/__/                       \/__/
 `
-	fmt.Println(fastGit3D)
+	fmt.Println(colors.RenderColor("cyan", fastGit3D))
 }
 
 func GetPenguin() {

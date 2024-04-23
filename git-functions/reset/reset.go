@@ -53,11 +53,14 @@ func Reset() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	cmd = exec.Command("git", "reset", choose)
-	_, err = cmd.Output()
-	if err != nil {
-		fmt.Println("Error executing git log command:", err)
-		return
+	confirm := form.Confirm("Reset to commit: " + choose + " ?")
+	if confirm {
+		cmd = exec.Command("git", "reset", choose)
+		_, err = cmd.Output()
+		if err != nil {
+			fmt.Println("Error executing git log command:", err)
+			return
+		}
+		fmt.Println(colors.RenderColor("blue", "Reset to commit: "+choose))
 	}
-	fmt.Println(colors.RenderColor("blue", "Reset to commit: "+choose))
 }

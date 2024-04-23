@@ -45,3 +45,44 @@ func MergeIntoCurrent() {
 	fmt.Println(mergeLog)
 	fmt.Println(colors.RenderColor("green", "Merge branch successfully"))
 }
+
+func MergeBranchIntoBranch() {
+	cmd := exec.Command("git", "branch")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	lines := strings.Split(string(output), "\n")
+
+	branches := make([]string, 0)
+
+	for _, line := range lines {
+		branch := strings.TrimSpace(strings.TrimPrefix(line, "* "))
+		if branch != "" && branch != "(no branch)" {
+			branches = append(branches, branch)
+		}
+	}
+
+	_, source, err := form.SelectFormWithStringSlice("Branch to merge from:", branches)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	_, target, err := form.SelectFormWithStringSlice("Target branch to merge into:", branches)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	mergeLog, err := command.RunCommand("git", "merge", source, target)
+	if err != nil {
+		fmt.Println(colors.RenderColor("red", "Failed to commit: "+err.Error()))
+		return
+	}
+
+	fmt.Println(mergeLog)
+	fmt.Println(colors.RenderColor("green", "Merge branch successfully"))
+}

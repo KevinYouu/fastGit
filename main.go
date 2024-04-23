@@ -40,6 +40,8 @@ func main() {
 		tag.CreateAndPushTag()
 	case "s":
 		status.Status()
+	case "m":
+		merge.MergeBranchIntoBranch()
 	case "mc":
 		merge.MergeIntoCurrent()
 	case "v":

@@ -9,6 +9,7 @@ import (
 	"github.com/KevinYouu/fastGit/git-functions/clone"
 	"github.com/KevinYouu/fastGit/git-functions/push"
 	"github.com/KevinYouu/fastGit/git-functions/remote"
+	"github.com/KevinYouu/fastGit/git-functions/reset"
 	"github.com/KevinYouu/fastGit/git-functions/status"
 	"github.com/KevinYouu/fastGit/git-functions/tag"
 )
@@ -31,6 +32,8 @@ func main() {
 		remote.Add()
 	case "rv":
 		remote.GetRemotes()
+	case "rs":
+		reset.Reset()
 	case "t":
 		tag.CreateAndPushTag()
 	case "s":

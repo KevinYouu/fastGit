@@ -44,7 +44,7 @@ func PushSelected() {
 	// suffix := choose.Choose([]string{"fix", "feat", "refactor", "style", "chore", "docs", "test", "revert"})
 	// commitMessage := input.Input("Enter your commit message: ", "commit message", "(esc to quit)", suffix+": ")
 
-	_, suffix, err := form.SelectForm(options)
+	_, suffix, err := form.SelectForm("Choose a commit type", options)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

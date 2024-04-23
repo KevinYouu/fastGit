@@ -34,7 +34,7 @@ func PushAll() {
 		os.Exit(0)
 	}
 	// suffix := choose.Choose([]string{"fix", "feat", "refactor", "style", "chore", "docs", "test", "revert"})
-	_, suffix, err := form.SelectForm(options)
+	_, suffix, err := form.SelectForm("Choose a commit type", options)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

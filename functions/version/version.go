@@ -47,8 +47,8 @@ func GetPenguin() {
 }
 
 func GetDivineBeast() {
-	Penguin := `
-	┏━┓   ┏━┓+ +
+	divineBeast := `
+	 ┏━┓   ┏━┓+ +
 	┏┛ ┻━━━┛ ┻┓ + +
 	┃         ┃  
 	┃   ━     ┃ ++ + + +
@@ -70,5 +70,5 @@ func GetDivineBeast() {
 	   ┃┫┫   ┃┫┫
 	   ┗┻┛   ┗┻┛ + + + +
 `
-	fmt.Println(Penguin)
+	fmt.Println(divineBeast)
 }

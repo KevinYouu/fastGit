@@ -9,7 +9,7 @@ type Option struct {
 	Value string
 }
 
-func SelectForm(options []Option) (label string, value string, err error) {
+func SelectForm(title string, options []Option) (label, value string, err error) {
 	var selectedValue string
 
 	selectOpts := make([]huh.Option[string], len(options))
@@ -20,7 +20,8 @@ func SelectForm(options []Option) (label string, value string, err error) {
 	form := huh.NewForm(
 		huh.NewGroup(
 			huh.NewSelect[string]().
-				Title("Choose your burger").
+				Height(100).
+				Title(title).
 				Options(selectOpts...).
 				Value(&selectedValue),
 		))

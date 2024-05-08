@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/KevinYouu/fastGit/functions/colors"
+	"github.com/KevinYouu/fastGit/functions/config"
 	"github.com/KevinYouu/fastGit/functions/form"
 )
 
@@ -30,7 +31,7 @@ func Reset() {
 
 	// Parse git log output and create Commit struct instances
 	lines := strings.Split(string(output), "\n")
-	var options = []form.Option{}
+	var options = []config.Option{}
 
 	for _, line := range lines {
 		parts := strings.Split(line, "|")
@@ -41,7 +42,7 @@ func Reset() {
 			author := parts[3]
 			email := parts[4]
 
-			options = append(options, form.Option{Label: fmt.Sprintf(
+			options = append(options, config.Option{Label: fmt.Sprintf(
 				"Hash: %s | Message: %s | Date: %s | Author: %s | Email: %s ",
 				hash, message, date, author, email,
 			), Value: hash})

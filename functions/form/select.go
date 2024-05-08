@@ -1,15 +1,11 @@
 package form
 
 import (
+	"github.com/KevinYouu/fastGit/functions/config"
 	"github.com/charmbracelet/huh"
 )
 
-type Option struct {
-	Label string
-	Value string
-}
-
-func SelectForm(title string, options []Option) (label, value string, err error) {
+func SelectForm(title string, options []config.Option) (label, value string, err error) {
 	var selectedValue string
 
 	selectOpts := make([]huh.Option[string], len(options))

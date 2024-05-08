@@ -13,7 +13,6 @@ import (
 )
 
 func Clone() {
-	// cloneURL := input.Input("Enter the URL of the repository you want to clone: ", "clone url", "(esc to quit)", "")
 	cloneURL, err := form.Input("Enter the URL of the repository you want to clone: ", "")
 	if err != nil {
 		fmt.Println(err)
@@ -34,6 +33,6 @@ func Clone() {
 	confirm := form.Confirm("Open repository in vscode?")
 	if confirm {
 		cmd = exec.Command("code", folderName)
-		_ = cmd.Run()
+		cmd.Run()
 	}
 }

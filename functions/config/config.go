@@ -19,14 +19,14 @@ type Config struct {
 func readConfigFromJSON(filename string) (Config, error) {
 	var config Config
 
-	// 尝试从文件中读取配置
+	// Open the file
 	file, err := os.Open(filename)
 	if err != nil {
 		return Config{}, err
 	}
 	defer file.Close()
 
-	// 解析 JSON 数据
+	// Read the file
 	data, err := io.ReadAll(file)
 	if err != nil {
 		return Config{}, err
@@ -41,13 +41,13 @@ func readConfigFromJSON(filename string) (Config, error) {
 }
 
 func writeConfigToJSON(filename string, config Config) error {
-	// 将配置对象序列化为 JSON
+	// Marshal the config
 	data, err := json.MarshalIndent(config, "", "    ")
 	if err != nil {
 		return err
 	}
 
-	// 写入文件
+	// Write the file
 	err = os.WriteFile(filename, data, 0644)
 	if err != nil {
 		return err
@@ -58,20 +58,7 @@ func writeConfigToJSON(filename string, config Config) error {
 	return nil
 }
 
-func GetDefaultOptions() []Option {
-	return []Option{
-		{Label: "fix", Value: "fix"},
-		{Label: "feat", Value: "feat"},
-		{Label: "refactor", Value: "refactor"},
-		{Label: "chore", Value: "chore"},
-		{Label: "style", Value: "style"},
-		{Label: "docs", Value: "docs"},
-		{Label: "build", Value: "build"},
-		{Label: "revert", Value: "revert"},
-		{Label: "test", Value: "test"},
-	}
-}
-
+// getUserHomeDir gets the user's home directory
 func getUserHomeDir() (string, error) {
 	usr, err := user.Current()
 	if err != nil {

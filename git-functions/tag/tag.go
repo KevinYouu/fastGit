@@ -10,10 +10,10 @@ import (
 	"strings"
 
 	"github.com/KevinYouu/fastGit/functions/colors"
-	"github.com/KevinYouu/fastGit/functions/input"
+	"github.com/KevinYouu/fastGit/functions/form"
 )
 
-// CreateAndPushTag 创建标签并推送到远程仓库
+// create a new tag and push it to the remote repository.
 func CreateAndPushTag() {
 
 	latestVersion, err := GetLatestTag()
@@ -23,8 +23,17 @@ func CreateAndPushTag() {
 	}
 	newVersion := incrementVersion(latestVersion)
 
-	version := input.Input("Enter your version: ", "tag commit message", "(esc to quit)", newVersion)
-	commitMessage := input.Input("Enter your commit message: ", "tag commit message", "(esc to quit)", "")
+	version,err:=form.Input("Enter your version: ",newVersion)
+	if err!=nil{
+		log.Printf("get version error: %s", err)
+		return
+	}
+	
+	commitMessage,err:=form.Input("Enter your commit message: ", "")
+	if err!=nil{
+		log.Printf("get commit message error: %s", err)
+		return
+	}
 
 	cmd := exec.Command("git", "tag", "-a", version, "-m", commitMessage)
 	output, err := cmd.CombinedOutput()
@@ -43,7 +52,7 @@ func CreateAndPushTag() {
 	fmt.Println(string(output), colors.RenderColor("green", "Tag pushed successfully."))
 }
 
-// GetLatestTag 获取最新的标签版本号，如果没有标签则返回 "0.0.0"
+// get the latest tag from the repository.
 func GetLatestTag() (string, error) {
 	cmd := exec.Command("git", "describe", "--tags", "--abbrev=0")
 	output, err := cmd.Output()
@@ -56,8 +65,8 @@ func GetLatestTag() (string, error) {
 	return strings.TrimSpace(string(output)), nil
 }
 
+// increment the version number.
 func incrementVersion(currentVersion string) string {
-	// 解析当前版本号
 	re := regexp.MustCompile(`(\d+)\.(\d+)\.(\d+)`)
 	matches := re.FindStringSubmatch(currentVersion)
 	if len(matches) != 4 {
@@ -65,12 +74,12 @@ func incrementVersion(currentVersion string) string {
 		os.Exit(1)
 	}
 
-	// 将版本号的每个部分转换为整数
+	// parse the version number
 	major, _ := strconv.Atoi(matches[1])
 	minor, _ := strconv.Atoi(matches[2])
 	patch, _ := strconv.Atoi(matches[3])
 
-	// 版本号自增逻辑
+	// increment the patch number
 	patch++
 	if patch > 9 {
 		patch = 0
@@ -85,7 +94,7 @@ func incrementVersion(currentVersion string) string {
 		}
 	}
 
-	// 重新构建版本号字符串
+	// 
 	newVersion := fmt.Sprintf("%d.%d.%d", major, minor, patch)
 	return newVersion
 }

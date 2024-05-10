@@ -4,7 +4,7 @@
 # Github: https://github.com/KevinYouu/fastGit
 
 repo="KevinYouu/fastGit"
-# 检查是否已安装 git
+# Check if git is installed
 if ! command -v git &>/dev/null; then
     echo "git is not installed. Please install git first."
     echo "https://git-scm.com/downloads"

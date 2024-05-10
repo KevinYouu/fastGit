@@ -4,12 +4,19 @@ import (
 	"fmt"
 
 	"github.com/KevinYouu/fastGit/functions/colors"
+	"github.com/KevinYouu/fastGit/functions/random"
 )
 
 var Version = "untracked"
 
 func GetVersion() {
-	GetLogo()
+	funcProbs := []random.FuncProbability{
+		{Function: func() { GetLogo() }, Probability: 0.98},
+		{Function: func() { GetPenguin() }, Probability: 0.1},
+		{Function: func() { GetDivineBeast() }, Probability: 0.1},
+	}
+	random.ExecuteRandomly(funcProbs)
+
 	fmt.Println("Version:", colors.RenderColor("blue", Version))
 	fmt.Println("Github:", colors.RenderColor("blue", "https://github.com/KevinYouu/fastGit"))
 	fmt.Println("Written in Go by", colors.RenderColor("blue", "KevinYouu"))

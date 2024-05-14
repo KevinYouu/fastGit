@@ -50,18 +50,16 @@ url=https://github.com/$repo/releases/download/$version/fastGit_"$version"_"$pac
 file=fastGit_"$version"_"$package_name".zip
 
 echo "Downloading $url"
-wget "$url"
 
-if [ $? -eq 0 ]; then
+if wget "$url"; then
     echo "Download successful"
 else
     echo "Download failed"
     exit 1
 fi
 echo "Extracting and installing $file"
-sudo unzip -o "$file" -d /usr/local/bin/
 
-if [ $? -eq 0 ]; then
+if sudo unzip -o "$file" -d /usr/local/bin/; then
     echo "Extraction successful"
 else
     echo "Extraction failed"
@@ -69,9 +67,7 @@ else
 fi
 
 # Set permissions
-chmod +x "/usr/local/bin/fastGit"
-
-if [ $? -eq 0 ]; then
+if chmod +x "/usr/local/bin/fastGit"; then
     echo "Permissions set successfully"
 else
     echo "Failed to set permissions"

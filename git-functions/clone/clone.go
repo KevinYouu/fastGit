@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/KevinYouu/fastGit/functions/colors"
 	"github.com/KevinYouu/fastGit/functions/form"
+	"github.com/KevinYouu/fastGit/functions/logs"
 	"github.com/KevinYouu/fastGit/functions/spinner"
 )
 
@@ -22,11 +22,11 @@ func Clone() {
 	spinner.Spinner("Cloning repository...", "done", func() {
 		output, err := cmd.CombinedOutput()
 		if err != nil {
-			fmt.Println(string(output), colors.RenderColor("red", "Failed to clone: "+string(output)))
+			logs.Error("Failed to clone: \n" + string(output))
 			return
 		}
-		fmt.Println(string(output), colors.RenderColor("green", "Cloned successfully."))
-		// Extract folder name from repo URL
+		fmt.Println(string(output))
+		logs.Success("Cloned successfully.")
 	})
 	folderName := filepath.Base(strings.TrimSuffix(cloneURL, ".git"))
 

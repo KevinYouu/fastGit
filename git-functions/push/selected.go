@@ -4,27 +4,28 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/KevinYouu/fastGit/functions/colors"
 	"github.com/KevinYouu/fastGit/functions/command"
 	"github.com/KevinYouu/fastGit/functions/config"
 	"github.com/KevinYouu/fastGit/functions/form"
+	"github.com/KevinYouu/fastGit/functions/logs"
 	"github.com/KevinYouu/fastGit/functions/spinner"
 	"github.com/KevinYouu/fastGit/git-functions/status"
 )
 
 func PushSelected() {
-	fileStatuss, err := status.GetFileStatuses()
+	fileStatus, err := status.GetFileStatuses()
 	if err != nil {
-		fmt.Println(colors.RenderColor("red", "Failed to get file statuses:"), err)
+		fmt.Println(err)
+		logs.Error("Failed to get file statuses")
 		os.Exit(1)
 	}
-	if len(fileStatuss) == 0 {
-		fmt.Println(colors.RenderColor("blue", "No files to push."))
+	if len(fileStatus) == 0 {
+		logs.Info("No files to push.")
 		os.Exit(0)
 	}
 
 	var selectedFiles []string
-	for _, fileStatus := range fileStatuss {
+	for _, fileStatus := range fileStatus {
 		if fileStatus.Status != "" {
 			selectedFiles = append(selectedFiles, fileStatus.Path)
 		}
@@ -33,18 +34,20 @@ func PushSelected() {
 	// data := multipleChoice.MultipleChoice(selectedFiles)
 	data, err := form.MultiSelectForm("Select files to push", selectedFiles)
 	if err != nil {
-		fmt.Println(colors.RenderColor("red", "Failed to get file statuses:"), err)
+		logs.Error("Failed to get file statuses:")
+		fmt.Println(err)
 		os.Exit(0)
 		return
 	}
 
 	if len(data) == 0 {
-		fmt.Println(colors.RenderColor("red", "No files selected."))
+		logs.Error("No files selected.")
 		os.Exit(0)
 	}
 	options, err := config.GetOptions()
 	if err != nil {
-		fmt.Println(colors.RenderColor("red", "Failed to get options:"), err)
+		logs.Error("Failed to get options:")
+		fmt.Println(err)
 		os.Exit(1)
 	}
 
@@ -62,31 +65,39 @@ func PushSelected() {
 	spinner.Spinner("Pushing...", "done", func() {
 		addLog, err := command.RunCommand("git", append([]string{"add"}, data...)...)
 		if err != nil {
-			fmt.Println(colors.RenderColor("red", "Failed to add files: "+err.Error()))
+			logs.Error("Failed to add files: ")
+			fmt.Println(err.Error())
 			return
 		}
-		fmt.Println(addLog, colors.RenderColor("green", "Files added successfully.\n"))
+		fmt.Println(addLog)
+		logs.Success("Files added successfully.\n")
 
 		commLog, err := command.RunCommand("git", "commit", "-m", commitMessage)
 		if err != nil {
-			fmt.Println(colors.RenderColor("red", "Failed to commit: "+err.Error()))
+			logs.Error("Failed to commit: ")
+			fmt.Println(err.Error())
 			return
 		}
-		fmt.Println(commLog, colors.RenderColor("green", "Commit successful.\n"))
+		fmt.Println(commLog)
+		logs.Success("Commit successful.\n")
 
 		pullLog, err := command.RunCommand("git", "pull")
 		if err != nil {
-			fmt.Println(colors.RenderColor("red", "Failed to pull: "+err.Error()))
+			logs.Error("Failed to pull: ")
+			fmt.Println(err.Error())
 			return
 		} else {
-			fmt.Println(pullLog, colors.RenderColor("green", "Pulled successfully.\n"))
+			fmt.Println(pullLog)
+			logs.Success("Pulled successfully.\n")
 		}
 
 		pushLog, err := command.RunCommand("git", "push")
 		if err != nil {
-			fmt.Println(colors.RenderColor("red", "Failed to push: "+err.Error()))
+			logs.Error("Failed to push: ")
+			fmt.Println(err.Error())
 			return
 		}
-		fmt.Println(pushLog, colors.RenderColor("green", "Push successful."))
+		fmt.Println(pushLog)
+		logs.Success("Pushed successfully.")
 	})
 }

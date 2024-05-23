@@ -67,7 +67,7 @@ else
 fi
 
 # Set permissions
-if chmod +x "/usr/local/bin/fastGit"; then
+if sudo chmod +x "/usr/local/bin/fastGit"; then
     echo "Permissions set successfully"
 else
     echo "Failed to set permissions"

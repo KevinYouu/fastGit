@@ -41,8 +41,6 @@ func main() {
 	case "s":
 		status.Status()
 	case "m":
-		merge.MergeBranchIntoBranch()
-	case "mc":
 		merge.MergeIntoCurrent()
 	case "v":
 		version.GetVersion()

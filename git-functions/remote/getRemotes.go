@@ -6,18 +6,19 @@ import (
 
 	"github.com/KevinYouu/fastGit/functions/colors"
 	"github.com/KevinYouu/fastGit/functions/command"
+	"github.com/KevinYouu/fastGit/functions/logs"
 )
 
 func GetRemotes() {
-	addlog, err := command.RunCommand("git", "remote", "-v")
+	output, err := command.RunCmd("git", []string{"remote", "-v"}, "Failed to get remotes: ")
 	if err != nil {
-		fmt.Println(colors.RenderColor("red", "Failed to get remotes: "+err.Error()))
-		os.Exit(1)
+		logs.Error("Failed to commit: " + output)
+		return
 	}
 
-	if addlog == "" {
+	if output == "" {
 		fmt.Println(colors.RenderColor("red", "No remotes found."))
 		os.Exit(1)
 	}
-	fmt.Println(addlog)
+	fmt.Println(output)
 }

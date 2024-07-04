@@ -61,40 +61,27 @@ func PushSelected() {
 		os.Exit(1)
 	}
 
-	addLog, err := command.RunCommand("git", append([]string{"add"}, data...)...)
+	output, err := command.RunCmd("git", append([]string{"add"}, data...), "Added files successfully.")
 	if err != nil {
-		logs.Error("Failed to add files: ")
-		fmt.Println(err.Error())
+		logs.Error("Failed to add files: " + output)
 		return
-	}
-	fmt.Println(addLog)
-	logs.Success("Files added successfully.\n")
-
-	commLog, err := command.RunCommand("git", "commit", "-m", commitMessage)
-	if err != nil {
-		logs.Error("Failed to commit: ")
-		fmt.Println(err.Error())
-		return
-	}
-	fmt.Println(commLog)
-	logs.Success("Commit successful.\n")
-
-	pullLog, err := command.RunCommand("git", "pull")
-	if err != nil {
-		logs.Error("Failed to pull: ")
-		fmt.Println(err.Error())
-		return
-	} else {
-		fmt.Println(pullLog)
-		logs.Success("Pulled successfully.\n")
 	}
 
-	pushLog, err := command.RunCommand("git", "push")
+	output, err = command.RunCmd("git", []string{"commit", "-m", commitMessage}, "Commit successfully.")
 	if err != nil {
-		logs.Error("Failed to push: ")
-		fmt.Println(err.Error())
+		logs.Error("Failed to commit: " + output)
 		return
 	}
-	fmt.Println(pushLog)
-	logs.Success("Pushed successfully.")
+
+	output, err = command.RunCmd("git", []string{"pull"}, "Pulled successfully.")
+	if err != nil {
+		logs.Error("Failed to pull: " + output)
+		return
+	}
+
+	output, err = command.RunCmd("git", []string{"push"}, "Pushed successfully.")
+	if err != nil {
+		logs.Error("Failed to push: " + output)
+		return
+	}
 }

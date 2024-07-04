@@ -2,26 +2,43 @@ package merge
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
 	"strings"
 
-	"github.com/KevinYouu/fastGit/functions/colors"
 	"github.com/KevinYouu/fastGit/functions/command"
 	"github.com/KevinYouu/fastGit/functions/form"
+	"github.com/KevinYouu/fastGit/functions/logs"
 )
 
 func MergeIntoCurrent() {
-	cmd := exec.Command("git", "branch")
-	output, err := cmd.CombinedOutput()
+	branches, err := getCurrentBranches()
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
 
-	lines := strings.Split(string(output), "\n")
+	selectedBranch, err := selectBranchToMerge(branches)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-	branches := make([]string, 0)
+	output, err := command.RunCmd("git", []string{"merge", selectedBranch}, "Merge branch successfully.")
+	if err != nil {
+		logs.Error("Failed to merge: " + output)
+		return
+	}
+}
+
+func getCurrentBranches() ([]string, error) {
+	cmd := exec.Command("git", "branch")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return nil, fmt.Errorf("error running git branch: %v", err)
+	}
+
+	lines := strings.Split(string(output), "\n")
+	var branches []string
 
 	for _, line := range lines {
 		branch := strings.TrimSpace(strings.TrimPrefix(line, "* "))
@@ -30,18 +47,13 @@ func MergeIntoCurrent() {
 		}
 	}
 
-	_, value, err := form.SelectFormWithStringSlice("Branch name to merge into the current branch", branches)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	return branches, nil
+}
 
-	mergeLog, err := command.RunCommand("git", "merge", value)
+func selectBranchToMerge(branches []string) (string, error) {
+	_, selectedBranch, err := form.SelectFormWithStringSlice("Branch name to merge into the current branch", branches)
 	if err != nil {
-		fmt.Println(colors.RenderColor("red", "Failed to commit: "+err.Error()))
-		return
+		return "", fmt.Errorf("error selecting branch: %v", err)
 	}
-
-	fmt.Println(mergeLog)
-	fmt.Println(colors.RenderColor("green", "Merge branch successfully"))
+	return selectedBranch, nil
 }

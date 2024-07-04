@@ -8,7 +8,6 @@ import (
 	"github.com/KevinYouu/fastGit/functions/config"
 	"github.com/KevinYouu/fastGit/functions/form"
 	"github.com/KevinYouu/fastGit/functions/logs"
-	"github.com/KevinYouu/fastGit/functions/spinner"
 	"github.com/KevinYouu/fastGit/git-functions/status"
 )
 
@@ -62,42 +61,40 @@ func PushSelected() {
 		os.Exit(1)
 	}
 
-	spinner.Spinner("Pushing...", "done", func() {
-		addLog, err := command.RunCommand("git", append([]string{"add"}, data...)...)
-		if err != nil {
-			logs.Error("Failed to add files: ")
-			fmt.Println(err.Error())
-			return
-		}
-		fmt.Println(addLog)
-		logs.Success("Files added successfully.\n")
+	addLog, err := command.RunCommand("git", append([]string{"add"}, data...)...)
+	if err != nil {
+		logs.Error("Failed to add files: ")
+		fmt.Println(err.Error())
+		return
+	}
+	fmt.Println(addLog)
+	logs.Success("Files added successfully.\n")
 
-		commLog, err := command.RunCommand("git", "commit", "-m", commitMessage)
-		if err != nil {
-			logs.Error("Failed to commit: ")
-			fmt.Println(err.Error())
-			return
-		}
-		fmt.Println(commLog)
-		logs.Success("Commit successful.\n")
+	commLog, err := command.RunCommand("git", "commit", "-m", commitMessage)
+	if err != nil {
+		logs.Error("Failed to commit: ")
+		fmt.Println(err.Error())
+		return
+	}
+	fmt.Println(commLog)
+	logs.Success("Commit successful.\n")
 
-		pullLog, err := command.RunCommand("git", "pull")
-		if err != nil {
-			logs.Error("Failed to pull: ")
-			fmt.Println(err.Error())
-			return
-		} else {
-			fmt.Println(pullLog)
-			logs.Success("Pulled successfully.\n")
-		}
+	pullLog, err := command.RunCommand("git", "pull")
+	if err != nil {
+		logs.Error("Failed to pull: ")
+		fmt.Println(err.Error())
+		return
+	} else {
+		fmt.Println(pullLog)
+		logs.Success("Pulled successfully.\n")
+	}
 
-		pushLog, err := command.RunCommand("git", "push")
-		if err != nil {
-			logs.Error("Failed to push: ")
-			fmt.Println(err.Error())
-			return
-		}
-		fmt.Println(pushLog)
-		logs.Success("Pushed successfully.")
-	})
+	pushLog, err := command.RunCommand("git", "push")
+	if err != nil {
+		logs.Error("Failed to push: ")
+		fmt.Println(err.Error())
+		return
+	}
+	fmt.Println(pushLog)
+	logs.Success("Pushed successfully.")
 }

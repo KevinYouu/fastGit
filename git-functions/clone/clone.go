@@ -9,7 +9,6 @@ import (
 
 	"github.com/KevinYouu/fastGit/functions/form"
 	"github.com/KevinYouu/fastGit/functions/logs"
-	"github.com/KevinYouu/fastGit/functions/spinner"
 )
 
 func Clone() {
@@ -19,15 +18,13 @@ func Clone() {
 		os.Exit(1)
 	}
 	cmd := exec.Command("git", "clone", cloneURL)
-	spinner.Spinner("Cloning repository...", "done", func() {
-		output, err := cmd.CombinedOutput()
-		if err != nil {
-			logs.Error("Failed to clone: \n" + string(output))
-			return
-		}
-		fmt.Println(string(output))
-		logs.Success("Cloned successfully.")
-	})
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		logs.Error("Failed to clone: \n" + string(output))
+		return
+	}
+	fmt.Println(string(output))
+	logs.Success("Cloned successfully.")
 	folderName := filepath.Base(strings.TrimSuffix(cloneURL, ".git"))
 
 	confirm := form.Confirm("Open repository in vscode?")

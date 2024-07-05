@@ -2,7 +2,8 @@ package config
 
 import (
 	"fmt"
-	"path/filepath"
+
+	"github.com/KevinYouu/fastGit/functions/logs"
 )
 
 // get the default options
@@ -22,20 +23,13 @@ func GetDefaultOptions() []Option {
 
 // get the options
 func GetOptions() ([]Option, error) {
-	homeDir, err := getUserHomeDir()
+	config, err := getConfig()
 	if err != nil {
-		fmt.Println("Error getting user home directory:", err)
-		return nil, err
-	}
-	configFile := filepath.Join(homeDir, ".fastGit.json")
-
-	var config Config
-	if err := readJSONConfig(configFile, &config); err != nil {
-		fmt.Println("Error reading config from JSON file:", err)
 		config.Options = GetDefaultOptions()
 
-		if err := writeJSONConfig(configFile, config); err != nil {
+		if err := writeJSONConfig(config); err != nil {
 			fmt.Println("Error writing default config to JSON file:", err)
+			logs.Info("touching the config file")
 			return nil, err
 		}
 	}

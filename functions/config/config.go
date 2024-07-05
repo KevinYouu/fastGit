@@ -2,10 +2,7 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
-	"io"
 	"os"
-	"os/user"
 )
 
 type Option struct {
@@ -16,53 +13,25 @@ type Config struct {
 	Options []Option `json:"options"`
 }
 
-func readConfigFromJSON(filename string) (Config, error) {
-	var config Config
-
-	// Open the file
-	file, err := os.Open(filename)
+// readJSONConfig reads the config from a JSON file
+func readJSONConfig(configFile string, config interface{}) error {
+	data, err := os.ReadFile(configFile)
 	if err != nil {
-		return Config{}, err
+		return err
 	}
-	defer file.Close()
-
-	// Read the file
-	data, err := io.ReadAll(file)
-	if err != nil {
-		return Config{}, err
-	}
-
-	err = json.Unmarshal(data, &config)
-	if err != nil {
-		return Config{}, err
-	}
-
-	return config, nil
+	return json.Unmarshal(data, config)
 }
 
-func writeConfigToJSON(filename string, config Config) error {
-	// Marshal the config
-	data, err := json.MarshalIndent(config, "", "    ")
+// writeJSONConfig writes the config to a JSON file
+func writeJSONConfig(configFile string, config interface{}) error {
+	data, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
 		return err
 	}
-
-	// Write the file
-	err = os.WriteFile(filename, data, 0644)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println("Config written to", filename)
-
-	return nil
+	return os.WriteFile(configFile, data, 0644)
 }
 
 // getUserHomeDir gets the user's home directory
 func getUserHomeDir() (string, error) {
-	usr, err := user.Current()
-	if err != nil {
-		return "", err
-	}
-	return usr.HomeDir, nil
+	return os.UserHomeDir()
 }

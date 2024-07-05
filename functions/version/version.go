@@ -12,8 +12,8 @@ var Version = "untracked"
 func GetVersion() {
 	funcProbs := []random.FuncProbability{
 		{Function: func() { GetLogo() }, Probability: 0.98},
-		{Function: func() { GetPenguin() }, Probability: 0.1},
-		{Function: func() { GetDivineBeast() }, Probability: 0.1},
+		{Function: func() { GetPenguin() }, Probability: 0.01},
+		{Function: func() { GetDivineBeast() }, Probability: 0.01},
 	}
 	random.ExecuteRandomly(funcProbs)
 

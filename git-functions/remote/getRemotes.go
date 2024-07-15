@@ -2,23 +2,18 @@ package remote
 
 import (
 	"fmt"
-	"os"
+	"os/exec"
+	"strings"
 
-	"github.com/KevinYouu/fastGit/functions/colors"
-	"github.com/KevinYouu/fastGit/functions/command"
 	"github.com/KevinYouu/fastGit/functions/logs"
 )
 
 func GetRemotes() {
-	output, err := command.RunCmd("git", []string{"remote", "-v"}, "Failed to get remotes: ")
+	output, err := exec.Command("git", "remote", "-v").CombinedOutput()
 	if err != nil {
-		logs.Error("Failed to commit: " + output)
+		logs.Error("Failed to get remotes: " + string(output))
 		return
 	}
-
-	if output == "" {
-		fmt.Println(colors.RenderColor("red", "No remotes found."))
-		os.Exit(1)
-	}
-	fmt.Println(output)
+	logs.Success("Remotes:")
+	fmt.Println(strings.TrimSpace(string(output)))
 }

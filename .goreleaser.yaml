@@ -8,7 +8,7 @@ before:
 
 builds:
   - id: build_noncgo
-    main: ./
+    main: ./cmd/fastgit
     binary: fastGit
     ldflags:
       - -s -w -X github.com/KevinYouu/fastGit/functions/version.Version={{.Version}}

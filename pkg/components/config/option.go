@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 
-	"github.com/KevinYouu/fastGit/functions/logs"
+	"github.com/KevinYouu/fastGit/pkg/components/logs"
 )
 
 // get the default options

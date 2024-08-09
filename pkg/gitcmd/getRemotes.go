@@ -1,11 +1,11 @@
-package remote
+package gitcmd
 
 import (
 	"fmt"
 	"os/exec"
 	"strings"
 
-	"github.com/KevinYouu/fastGit/functions/logs"
+	"github.com/KevinYouu/fastGit/pkg/components/logs"
 )
 
 func GetRemotes() {

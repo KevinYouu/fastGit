@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/KevinYouu/fastGit/functions/colors"
+	"github.com/KevinYouu/fastGit/pkg/components/colors"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"

@@ -1,13 +1,13 @@
-package merge
+package gitcmd
 
 import (
 	"fmt"
 	"os/exec"
 	"strings"
 
-	"github.com/KevinYouu/fastGit/functions/command"
-	"github.com/KevinYouu/fastGit/functions/form"
-	"github.com/KevinYouu/fastGit/functions/logs"
+	"github.com/KevinYouu/fastGit/pkg/components/command"
+	"github.com/KevinYouu/fastGit/pkg/components/form"
+	"github.com/KevinYouu/fastGit/pkg/components/logs"
 )
 
 func MergeIntoCurrent() {

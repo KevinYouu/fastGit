@@ -3,7 +3,7 @@ package logs
 import (
 	"fmt"
 
-	"github.com/KevinYouu/fastGit/functions/colors"
+	"github.com/KevinYouu/fastGit/pkg/components/colors"
 )
 
 // Waring should be used to render warning text

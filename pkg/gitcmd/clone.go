@@ -1,4 +1,4 @@
-package clone
+package gitcmd
 
 import (
 	"fmt"
@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/KevinYouu/fastGit/functions/form"
-	"github.com/KevinYouu/fastGit/functions/logs"
+	"github.com/KevinYouu/fastGit/pkg/components/form"
+	"github.com/KevinYouu/fastGit/pkg/components/logs"
 )
 
 func Clone() {

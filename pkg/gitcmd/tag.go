@@ -1,4 +1,4 @@
-package tag
+package gitcmd
 
 import (
 	"fmt"
@@ -9,13 +9,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/KevinYouu/fastGit/functions/colors"
-	"github.com/KevinYouu/fastGit/functions/form"
+	"github.com/KevinYouu/fastGit/pkg/components/colors"
+	"github.com/KevinYouu/fastGit/pkg/components/form"
 )
 
 // create a new tag and push it to the remote repository.
 func CreateAndPushTag() {
-
 	latestVersion, err := GetLatestTag()
 	if err != nil {
 		log.Printf("get latest tag error: %s", err)
@@ -23,14 +22,14 @@ func CreateAndPushTag() {
 	}
 	newVersion := incrementVersion(latestVersion)
 
-	version,err:=form.Input("Enter your version: ",newVersion)
-	if err!=nil{
+	version, err := form.Input("Enter your version: ", newVersion)
+	if err != nil {
 		log.Printf("get version error: %s", err)
 		return
 	}
-	
-	commitMessage,err:=form.Input("Enter your commit message: ", "")
-	if err!=nil{
+
+	commitMessage, err := form.Input("Enter your commit message: ", "")
+	if err != nil {
 		log.Printf("get commit message error: %s", err)
 		return
 	}
@@ -94,7 +93,7 @@ func incrementVersion(currentVersion string) string {
 		}
 	}
 
-	// 
+	//
 	newVersion := fmt.Sprintf("%d.%d.%d", major, minor, patch)
 	return newVersion
 }

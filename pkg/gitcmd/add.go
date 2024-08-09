@@ -1,15 +1,15 @@
-package remote
+package gitcmd
 
 import (
 	"fmt"
 	"os"
 	"os/exec"
 
-	"github.com/KevinYouu/fastGit/functions/colors"
-	"github.com/KevinYouu/fastGit/functions/form"
+	"github.com/KevinYouu/fastGit/pkg/components/colors"
+	"github.com/KevinYouu/fastGit/pkg/components/form"
 )
 
-func Add() {
+func AddRemote() {
 	form_props := form.FormProps{
 		Message:      "Enter the following information:",
 		Field:        "remote name",

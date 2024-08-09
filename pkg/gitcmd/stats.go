@@ -1,4 +1,4 @@
-package status
+package gitcmd
 
 import (
 	"fmt"
@@ -6,13 +6,12 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/KevinYouu/fastGit/functions/colors"
+	"github.com/KevinYouu/fastGit/pkg/components/colors"
 )
 
-// FileStatus 结构体表示文件的状态和路径
 type FileStatus struct {
-	Status string // 文件状态 (如 "M", "A", "??")
-	Path   string // 文件路径
+	Status string
+	Path   string
 }
 
 func statusColor(status string) string {
@@ -32,15 +31,13 @@ func statusColor(status string) string {
 	}
 }
 
-func GetFileStatuses() ([]FileStatus, error) {
-	// 执行 git status 命令
+func getFileStatuses() ([]FileStatus, error) {
 	cmd := exec.Command("git", "status", "--porcelain")
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, fmt.Errorf("error executing command: %v", err)
 	}
 
-	// 解析 git status 输出并创建 FileStatus 结构体实例
 	lines := strings.Split(string(output), "\n")
 	var files []FileStatus
 
@@ -57,7 +54,7 @@ func GetFileStatuses() ([]FileStatus, error) {
 }
 
 func Status() {
-	fileStatuss, err := GetFileStatuses()
+	fileStatuss, err := getFileStatuses()
 	if err != nil {
 		fmt.Println(colors.RenderColor("red", "Failed to get file statuses:"), err)
 		os.Exit(1)
@@ -74,12 +71,3 @@ func Status() {
 		fmt.Println(colors.RenderColor(color, file.Status+" "+file.Path))
 	}
 }
-
-// func Status() {
-// 	log, err := command.RunCommand("git", "status")
-// 	if err != nil {
-// 		fmt.Println("error executing git status command:", err)
-// 		os.Exit(1)
-// 	}
-// 	fmt.Println(log)
-// }

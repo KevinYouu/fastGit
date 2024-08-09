@@ -1,7 +1,7 @@
 package form
 
 import (
-	"github.com/KevinYouu/fastGit/functions/config"
+	"github.com/KevinYouu/fastGit/pkg/components/config"
 	"github.com/charmbracelet/huh"
 )
 

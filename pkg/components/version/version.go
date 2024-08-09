@@ -3,8 +3,8 @@ package version
 import (
 	"fmt"
 
-	"github.com/KevinYouu/fastGit/functions/colors"
-	"github.com/KevinYouu/fastGit/functions/random"
+	"github.com/KevinYouu/fastGit/pkg/components/colors"
+	"github.com/KevinYouu/fastGit/pkg/components/random"
 )
 
 var Version = "untracked"

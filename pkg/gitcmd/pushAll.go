@@ -1,18 +1,17 @@
-package push
+package gitcmd
 
 import (
 	"fmt"
 	"os"
 
-	"github.com/KevinYouu/fastGit/functions/command"
-	"github.com/KevinYouu/fastGit/functions/config"
-	"github.com/KevinYouu/fastGit/functions/form"
-	"github.com/KevinYouu/fastGit/functions/logs"
-	"github.com/KevinYouu/fastGit/git-functions/status"
+	"github.com/KevinYouu/fastGit/pkg/components/command"
+	"github.com/KevinYouu/fastGit/pkg/components/config"
+	"github.com/KevinYouu/fastGit/pkg/components/form"
+	"github.com/KevinYouu/fastGit/pkg/components/logs"
 )
 
-func PushSelected() {
-	fileStatus, err := status.GetFileStatuses()
+func PushAll() {
+	fileStatus, err := getFileStatuses()
 	if err != nil {
 		fmt.Println(err)
 		logs.Error("Failed to get file statuses")
@@ -23,26 +22,6 @@ func PushSelected() {
 		os.Exit(0)
 	}
 
-	var selectedFiles []string
-	for _, fileStatus := range fileStatus {
-		if fileStatus.Status != "" {
-			selectedFiles = append(selectedFiles, fileStatus.Path)
-		}
-	}
-
-	// data := multipleChoice.MultipleChoice(selectedFiles)
-	data, err := form.MultiSelectForm("Select files to push", selectedFiles)
-	if err != nil {
-		logs.Error("Failed to get file statuses:")
-		fmt.Println(err)
-		os.Exit(0)
-		return
-	}
-
-	if len(data) == 0 {
-		logs.Error("No files selected.")
-		os.Exit(0)
-	}
 	options, err := config.GetOptions()
 	if err != nil {
 		logs.Error("Failed to get options:")
@@ -55,15 +34,16 @@ func PushSelected() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+
 	commitMessage, err := form.Input("Enter your commit message: ", suffix+": ")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	output, err := command.RunCmd("git", append([]string{"add"}, data...), "Added files successfully.")
+	output, err := command.RunCmd("git", []string{"add", "-A"}, "Files added successfully.")
 	if err != nil {
-		logs.Error("Failed to add files: " + output)
+		logs.Error("Failed to add: " + output)
 		return
 	}
 

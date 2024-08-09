@@ -1,4 +1,4 @@
-package reset
+package gitcmd
 
 import (
 	"fmt"
@@ -6,9 +6,9 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/KevinYouu/fastGit/functions/colors"
-	"github.com/KevinYouu/fastGit/functions/config"
-	"github.com/KevinYouu/fastGit/functions/form"
+	"github.com/KevinYouu/fastGit/pkg/components/colors"
+	"github.com/KevinYouu/fastGit/pkg/components/config"
+	"github.com/KevinYouu/fastGit/pkg/components/form"
 )
 
 // Commit struct represents a commit record

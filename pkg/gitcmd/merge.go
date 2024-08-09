@@ -40,9 +40,17 @@ func getCurrentBranches() ([]string, error) {
 	lines := strings.Split(string(output), "\n")
 	var branches []string
 
+	currentBranch, err := command.RunCmd("git", []string{"branch", "--show-current"}, "Files added successfully.")
+	if err != nil {
+		logs.Error("Failed to add: " + currentBranch)
+		return nil, err
+	}
+
+	current := strings.TrimSpace(currentBranch)
+
 	for _, line := range lines {
 		branch := strings.TrimSpace(strings.TrimPrefix(line, "* "))
-		if branch != "" && branch != "(no branch)" {
+		if branch != "" && branch != "(no branch)" && branch != current {
 			branches = append(branches, branch)
 		}
 	}

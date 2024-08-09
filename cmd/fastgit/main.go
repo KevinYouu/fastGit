@@ -11,7 +11,7 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "fastGit",
-	Short: "A fast Git command-line tool",
+	Short: "fastGit is a tool that helps you quickly submit code with a command line interface.",
 	Run: func(cmd *cobra.Command, args []string) {
 		version.GetVersion()
 	},

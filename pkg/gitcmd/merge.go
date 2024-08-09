@@ -17,6 +17,11 @@ func MergeIntoCurrent() {
 		return
 	}
 
+	if len(branches) == 0 {
+		logs.Info("No branches to merge.")
+		return
+	}
+
 	selectedBranch, err := selectBranchToMerge(branches)
 	if err != nil {
 		fmt.Println(err)
@@ -40,13 +45,13 @@ func getCurrentBranches() ([]string, error) {
 	lines := strings.Split(string(output), "\n")
 	var branches []string
 
-	currentBranch, err := command.RunCmd("git", []string{"branch", "--show-current"}, "Files added successfully.")
+	currentBranch, err := exec.Command("git", "branch", "--show-current").CombinedOutput()
 	if err != nil {
-		logs.Error("Failed to add: " + currentBranch)
+		logs.Error("Failed to add: " + string(currentBranch))
 		return nil, err
 	}
 
-	current := strings.TrimSpace(currentBranch)
+	current := strings.TrimSpace(string(currentBranch))
 
 	for _, line := range lines {
 		branch := strings.TrimSpace(strings.TrimPrefix(line, "* "))

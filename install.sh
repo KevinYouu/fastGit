@@ -24,7 +24,7 @@ function systemCheck() {
     Darwin)
         if [ "$arch" == "x86_64" ]; then
             package_name="darwin_amd64"
-        elif [ "$arch" == "aarch64" ]; then
+        elif [ "$arch" == "arm64" ]; then
             package_name="darwin_arm64"
         else
             echo "Your system is not supported."

@@ -1,6 +1,6 @@
 module github.com/KevinYouu/fastGit
 
-go 1.22.6
+go 1.23.2
 
 require (
 	github.com/charmbracelet/bubbles v0.18.0

@@ -6,7 +6,10 @@ type Option struct {
 	Usage int
 }
 
-type Config struct {
-	Options []Option
-	Patch   int8
+type Patch struct {
+	Prefix string
+	Major  int
+	Minor  int
+	Patch  int
+	Suffix string
 }

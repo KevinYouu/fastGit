@@ -43,3 +43,7 @@ func GetOptions() ([]Option, error) {
 
 	return options, nil
 }
+
+func SaveOptions(options []Option) error {
+	return SaveRecords(options, "options", []string{"label", "value", "usage"}, "value", []string{"label", "usage"})
+}

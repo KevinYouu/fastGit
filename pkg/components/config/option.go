@@ -26,7 +26,7 @@ func GetOptions() ([]Option, error) {
 	}
 	defer db.Close()
 
-	rows, err := db.Query("SELECT label, value, usage FROM options")
+	rows, err := db.Query("SELECT label, value, usage FROM options ORDER BY usage DESC")
 	if err != nil {
 		return nil, fmt.Errorf("failed to query options: %w", err)
 	}

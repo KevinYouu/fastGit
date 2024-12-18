@@ -54,6 +54,8 @@ func PushSelected() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+	config.IncrementUsage(suffix)
+
 	commitMessage, err := form.Input("Enter your commit message: ", suffix+": ")
 	if err != nil {
 		fmt.Println(err)

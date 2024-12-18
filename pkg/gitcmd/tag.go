@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/KevinYouu/fastGit/pkg/components/colors"
+	"github.com/KevinYouu/fastGit/pkg/components/config"
 	"github.com/KevinYouu/fastGit/pkg/components/form"
 )
 
@@ -78,22 +79,27 @@ func incrementVersion(currentVersion string) string {
 	minor, _ := strconv.Atoi(matches[2])
 	patch, _ := strconv.Atoi(matches[3])
 
+	maxPatch, err := config.GetTagPatch()
+	if err != nil {
+		fmt.Println("❌ line 84 err ➡️", err)
+		return "0.0.0"
+	}
+
 	// increment the patch number
 	patch++
-	if patch > 9 {
+	if patch > maxPatch.Patch {
 		patch = 0
 		minor++
-		if minor > 9 {
+		if minor > maxPatch.Minor {
 			minor = 0
 			major++
-			// if major > 99 {
+			// if major > maxPatch.Major {
 			// 	fmt.Println("Version number out of range")
 			// 	os.Exit(1)
 			// }
 		}
 	}
 
-	//
 	newVersion := fmt.Sprintf("%d.%d.%d", major, minor, patch)
 	return newVersion
 }

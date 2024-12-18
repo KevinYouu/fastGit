@@ -28,6 +28,7 @@ func GetOptions() ([]Option, error) {
 
 	rows, err := db.Query("SELECT label, value, usage FROM options ORDER BY usage DESC")
 	if err != nil {
+		fmt.Println("❌ line 31 err ➡️", err)
 		return nil, fmt.Errorf("failed to query options: %w", err)
 	}
 	defer rows.Close()
@@ -36,9 +37,15 @@ func GetOptions() ([]Option, error) {
 	for rows.Next() {
 		var option Option
 		if err := rows.Scan(&option.Label, &option.Value, &option.Usage); err != nil {
+			fmt.Println("❌ line 40 err ➡️", err)
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
 		options = append(options, option)
+	}
+
+	if err := rows.Err(); err != nil {
+		fmt.Println("❌ line 47 err ➡️", err)
+		return nil, fmt.Errorf("error during rows iteration: %w", err)
 	}
 
 	return options, nil

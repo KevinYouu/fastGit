@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // Get the path to the SQLite database
@@ -97,16 +99,18 @@ func SaveRecords[T any](
 	return nil
 }
 
-// extractValues 是一个辅助函数，用于从结构体中提取列值
+// extractValues is a helper function to extract values from a struct
 func extractValues[T any](record T, columns []string) []interface{} {
 	v := reflect.ValueOf(record)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
 
+	caser := cases.Title(language.Und)
+
 	values := make([]interface{}, len(columns))
 	for i, col := range columns {
-		field := v.FieldByName(strings.Title(col)) // 假设字段名与列名匹配
+		field := v.FieldByName(caser.String(col))
 		if field.IsValid() {
 			values[i] = field.Interface()
 		} else {
@@ -167,7 +171,6 @@ func Initialize() error {
 	// If no patches exist, insert default patches
 	if count == 0 {
 		defaultPatches := GetDefaultTagPatch()
-		fmt.Println("🚀 line 136 defaultPatches ➡️", defaultPatches)
 		err = SavePatches(defaultPatches)
 		if err != nil {
 			return fmt.Errorf("failed to insert default patches: %w", err)

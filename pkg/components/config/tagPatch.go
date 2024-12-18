@@ -1,37 +1,34 @@
 package config
 
-import "fmt"
+import (
+	"database/sql"
+	"fmt"
+)
 
 func GetDefaultTagPatch() []Patch {
 	return []Patch{
-		{Prefix: "", Major: 0, Minor: 0, Patch: 0, Suffix: ""},
+		{Prefix: "", Major: 999, Minor: 9, Patch: 9, Suffix: ""},
 	}
 }
 
-func GetTagPatch() ([]Patch, error) {
+func GetTagPatch() (Patch, error) {
 	db, err := openDB()
 	if err != nil {
-		return nil, err
+		return Patch{}, fmt.Errorf("failed to open database: %w", err)
 	}
 	defer db.Close()
 
-	rows, err := db.Query("SELECT prefix, major, minor, patch, suffix FROM options ORDER BY usage DESC")
-	if err != nil {
-		fmt.Println(err)
-		return nil, fmt.Errorf("failed to query options: %w", err)
-	}
-	defer rows.Close()
+	row := db.QueryRow("SELECT prefix, major, minor, patch, suffix FROM patches LIMIT 1")
 
-	var Patches []Patch
-	for rows.Next() {
-		var patch Patch
-		if err := rows.Scan(&patch.Prefix, &patch.Major, &patch.Minor, &patch.Patch, &patch.Suffix); err != nil {
-			return nil, fmt.Errorf("failed to scan row: %w", err)
+	var patch Patch
+	if err := row.Scan(&patch.Prefix, &patch.Major, &patch.Minor, &patch.Patch, &patch.Suffix); err != nil {
+		if err == sql.ErrNoRows {
+			return Patch{}, fmt.Errorf("no patch record found")
 		}
-		Patches = append(Patches, patch)
+		return Patch{}, fmt.Errorf("failed to scan row: %w", err)
 	}
 
-	return Patches, nil
+	return patch, nil
 }
 
 func SavePatches(patches []Patch) error {

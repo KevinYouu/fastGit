@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/KevinYouu/fastGit/pkg/components/config"
 	"github.com/KevinYouu/fastGit/pkg/components/version"
 	"github.com/KevinYouu/fastGit/pkg/gitcmd"
 	"github.com/spf13/cobra"
@@ -87,6 +88,13 @@ func init() {
 			Short: "Show version",
 			Run: func(cmd *cobra.Command, args []string) {
 				version.GetVersion()
+			},
+		},
+		&cobra.Command{
+			Use:   "init",
+			Short: "Initialize configuration",
+			Run: func(cmd *cobra.Command, args []string) {
+				config.Initialize()
 			},
 		},
 	)

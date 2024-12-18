@@ -2,37 +2,44 @@ package config
 
 import (
 	"fmt"
-
-	"github.com/KevinYouu/fastGit/pkg/components/logs"
 )
 
 // get the default options
 func GetDefaultOptions() []Option {
 	return []Option{
-		{Label: "fix", Value: "fix"},
-		{Label: "feat", Value: "feat"},
-		{Label: "refactor", Value: "refactor"},
-		{Label: "chore", Value: "chore"},
-		{Label: "style", Value: "style"},
-		{Label: "docs", Value: "docs"},
-		{Label: "build", Value: "build"},
-		{Label: "revert", Value: "revert"},
-		{Label: "test", Value: "test"},
+		{Label: "fix", Value: "fix", Usage: 0},
+		{Label: "feat", Value: "feat", Usage: 0},
+		{Label: "refactor", Value: "refactor", Usage: 0},
+		{Label: "build", Value: "build", Usage: 0},
+		{Label: "chore", Value: "chore", Usage: 0},
+		{Label: "style", Value: "style", Usage: 0},
+		{Label: "docs", Value: "docs", Usage: 0},
+		{Label: "revert", Value: "revert", Usage: 0},
+		{Label: "test", Value: "test", Usage: 0},
 	}
 }
 
-// get the options
 func GetOptions() ([]Option, error) {
-	config, err := getConfig()
+	db, err := openDB()
 	if err != nil {
-		config.Options = GetDefaultOptions()
+		return nil, err
+	}
+	defer db.Close()
 
-		if err := writeJSONConfig(config); err != nil {
-			fmt.Println("Error writing default config to JSON file:", err)
-			logs.Info("touching the config file")
-			return nil, err
+	rows, err := db.Query("SELECT label, value, usage FROM options")
+	if err != nil {
+		return nil, fmt.Errorf("failed to query options: %w", err)
+	}
+	defer rows.Close()
+
+	var options []Option
+	for rows.Next() {
+		var option Option
+		if err := rows.Scan(&option.Label, &option.Value, &option.Usage); err != nil {
+			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
+		options = append(options, option)
 	}
 
-	return config.Options, nil
+	return options, nil
 }

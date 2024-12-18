@@ -12,6 +12,7 @@ import (
 type Option struct {
 	Label string `json:"label"`
 	Value string `json:"value"`
+	Usage int    `json:"usage"`
 }
 
 type Config struct {

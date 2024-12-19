@@ -24,7 +24,7 @@ func openDB() (*sql.DB, error) {
 	dbPath := getDBPath()
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open database: %w", err)
+		return nil, err
 	}
 	return db, nil
 }
@@ -38,23 +38,23 @@ func SaveRecords[T any](
 ) error {
 	db, err := openDB()
 	if err != nil {
-		return fmt.Errorf("failed to open database: %w", err)
+		fmt.Println("❌ 41 err ➡️", err)
+		return err
 	}
 	defer db.Close()
 
 	tx, err := db.Begin()
 	if err != nil {
-		return fmt.Errorf("failed to begin transaction: %w", err)
+		fmt.Println("❌ 48 err ➡️", err)
+		return err
 	}
 	defer tx.Rollback()
 
-	// 动态构建插入 SQL
 	columnPlaceholders := make([]string, len(columns))
 	for i := range columns {
 		columnPlaceholders[i] = "?"
 	}
 
-	// 基础插入 SQL
 	baseSQL := fmt.Sprintf(
 		"INSERT INTO %s (%s) VALUES (%s)",
 		tableName,
@@ -62,7 +62,6 @@ func SaveRecords[T any](
 		strings.Join(columnPlaceholders, ", "),
 	)
 
-	// 添加 ON CONFLICT 子句（如果需要）
 	if conflictColumn != "" {
 		setClauses := make([]string, len(updateColumns))
 		for i, col := range updateColumns {
@@ -75,25 +74,25 @@ func SaveRecords[T any](
 		)
 	}
 
-	// 准备语句
 	stmt, err := tx.Prepare(baseSQL)
 	if err != nil {
-		return fmt.Errorf("failed to prepare statement: %w", err)
+		fmt.Println("❌ line 83 err ➡️", err)
+		return err
 	}
 	defer stmt.Close()
 
-	// 执行插入或更新
 	for _, record := range records {
 		values := extractValues(record, columns)
 		_, err := stmt.Exec(values...)
 		if err != nil {
-			return fmt.Errorf("failed to execute statement: %w", err)
+			fmt.Println("❌ line 88 err ➡️", err)
+			return err
 		}
 	}
 
-	// 提交事务
 	if err := tx.Commit(); err != nil {
-		return fmt.Errorf("failed to commit transaction: %w", err)
+		fmt.Println("❌ line 94 err ➡️", err)
+		return err
 	}
 
 	return nil
@@ -131,13 +130,13 @@ func Initialize() error {
 	// Create the options table
 	if err := migrateOptionsTable(db); err != nil {
 		fmt.Println("❌ line 98 err ➡️", err)
-		return fmt.Errorf("failed to migrate table: %w", err)
+		return err
 	}
 
 	// Create the patches table
 	if err := migratePatchesTable(db); err != nil {
 		fmt.Println("❌ line 104 err ➡️", err)
-		return fmt.Errorf("failed to migrate table: %w", err)
+		return err
 	}
 
 	// Count the number of options
@@ -146,7 +145,7 @@ func Initialize() error {
 	err = db.QueryRow(countQuery).Scan(&count)
 	if err != nil {
 		fmt.Println("❌ line 113 err ➡️", err)
-		return fmt.Errorf("failed to count options: %w", err)
+		return err
 	}
 
 	// If no options exist, insert default options
@@ -156,7 +155,7 @@ func Initialize() error {
 		err = SaveOptions(defaultOptions)
 		if err != nil {
 			fmt.Println("❌ line 123 err ➡️", err)
-			return fmt.Errorf("failed to insert default options: %w", err)
+			return err
 		}
 	}
 
@@ -165,7 +164,7 @@ func Initialize() error {
 	err = db.QueryRow(countQuery).Scan(&count)
 	if err != nil {
 		fmt.Println("❌ line 132 err ➡️", err)
-		return fmt.Errorf("failed to count patches: %w", err)
+		return err
 	}
 
 	// If no patches exist, insert default patches
@@ -173,7 +172,8 @@ func Initialize() error {
 		defaultPatches := GetDefaultTagPatch()
 		err = SavePatches(defaultPatches)
 		if err != nil {
-			return fmt.Errorf("failed to insert default patches: %w", err)
+			fmt.Println("❌ line 179 err ➡️", err)
+			return err
 		}
 	}
 
@@ -208,7 +208,8 @@ func migrateTable(db *sql.DB, tableName string, requiredColumns map[string]strin
 	query := fmt.Sprintf(`SELECT 1 FROM sqlite_master WHERE type='table' AND name='%s'`, tableName)
 	err := db.QueryRow(query).Scan(&tableExists)
 	if err != nil && err != sql.ErrNoRows {
-		return fmt.Errorf("failed to check table existence for %s: %w", tableName, err)
+		fmt.Println("❌ line 215 err ➡️", err)
+		return err
 	}
 
 	// If the table doesn't exist, create it
@@ -224,7 +225,8 @@ func migrateTable(db *sql.DB, tableName string, requiredColumns map[string]strin
 		)
 		_, err := db.Exec(createTableQuery)
 		if err != nil {
-			return fmt.Errorf("failed to create table %s: %w", tableName, err)
+			fmt.Println("❌ line 232 err ➡️", err)
+			return err
 		}
 	} else if err == nil && tableExists == 1 {
 		// If the table exists, check for missing columns
@@ -232,7 +234,8 @@ func migrateTable(db *sql.DB, tableName string, requiredColumns map[string]strin
 		tableInfoQuery := fmt.Sprintf(`PRAGMA table_info(%s)`, tableName)
 		rows, err := db.Query(tableInfoQuery)
 		if err != nil {
-			return fmt.Errorf("failed to query table info for %s: %w", tableName, err)
+			fmt.Println("❌ line 241 err ➡️", err)
+			return err
 		}
 		defer rows.Close()
 
@@ -247,7 +250,8 @@ func migrateTable(db *sql.DB, tableName string, requiredColumns map[string]strin
 				primaryKey   int
 			)
 			if err := rows.Scan(&cid, &name, &dataType, &notNull, &defaultValue, &primaryKey); err != nil {
-				return fmt.Errorf("failed to scan table info for %s: %w", tableName, err)
+				fmt.Println("❌ line 257 err ➡️", err)
+				return err
 			}
 			existingColumns[name] = true
 		}
@@ -257,7 +261,8 @@ func migrateTable(db *sql.DB, tableName string, requiredColumns map[string]strin
 			if !existingColumns[column] {
 				alterQuery := fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %s", tableName, column, definition)
 				if _, err := db.Exec(alterQuery); err != nil {
-					return fmt.Errorf("failed to add column %s to table %s: %w", column, tableName, err)
+					fmt.Println("❌ line 268 err ➡️", err)
+					return err
 				}
 			}
 		}

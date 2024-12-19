@@ -2,7 +2,6 @@ package config
 
 import (
 	"database/sql"
-	"fmt"
 )
 
 func GetDefaultTagPatch() []Patch {
@@ -14,7 +13,7 @@ func GetDefaultTagPatch() []Patch {
 func GetTagPatch() (Patch, error) {
 	db, err := openDB()
 	if err != nil {
-		return Patch{}, fmt.Errorf("failed to open database: %w", err)
+		return GetDefaultTagPatch()[0], err
 	}
 	defer db.Close()
 
@@ -23,9 +22,9 @@ func GetTagPatch() (Patch, error) {
 	var patch Patch
 	if err := row.Scan(&patch.Prefix, &patch.Major, &patch.Minor, &patch.Patch, &patch.Suffix); err != nil {
 		if err == sql.ErrNoRows {
-			return Patch{}, fmt.Errorf("no patch record found")
+			return GetDefaultTagPatch()[0], err
 		}
-		return Patch{}, fmt.Errorf("failed to scan row: %w", err)
+		return GetDefaultTagPatch()[0], err
 	}
 
 	return patch, nil

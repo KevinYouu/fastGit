@@ -46,19 +46,21 @@ fastGit ps
 
 ### Features
 
-- [x] `fastGit pa`, submit all changes in the working directory
+- [x] `fastGit pa`, Submit all changes in the working directory
 
-- [x] `fastGit ps`, submit some changes in the working directory
+- [x] `fastGit ps`, Submit some changes in the working directory
 
-- [x] `fastGit c`, clone a repository
+- [x] `fastGit t`, Create and push a tag
 
-- [x] `fastGit t`, create and push a tag
+- [x] `fastGit m`, Merge the selected branch into the current branch.
+
+- [x] `fastGit rs` Reset to the selected hash version.
+
+- [x] `fastGit init` Initialize fastGit configuration.
 
 - [x] `fastGit s`, check the status of the repository
 
 - [x] `fastGit rv`, get all remote repositories
-
-- [x] `fastGit ra`, add a remote repository
 
 More features will be added soon......
 

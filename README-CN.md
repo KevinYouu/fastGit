@@ -50,13 +50,17 @@ fastGit ps
 
 - [x] `fastGit ps`, 提交部分已修改的代码
 
-- [x] `fastGit c`, 用于克隆远程仓库
+- [x] `fastGit t`, 创建和推送 tag
 
-- [x] `fastGit t`, 用于创建和推送 tag
+- [x] `fastGit m`, 将选择的分支合并到当前分支
 
-- [x] `fastGit s`, 用于查看工作区状态
+- [x] `fastGit rs`, 重置到选择的 hash 版本
 
-- [x] `fastGit ra`，用于添加远程仓库
+- [x] `fastGit init`, 初始化 fastGit 配置
+
+- [x] `fastGit s`, 查看工作区状态
+
+- [x] `fastGit rv`, 获取所有远程仓库
 
 更多功能正在开发中.....
 

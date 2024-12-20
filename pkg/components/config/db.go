@@ -151,7 +151,6 @@ func Initialize() error {
 	// If no options exist, insert default options
 	if count == 0 {
 		defaultOptions := GetDefaultOptions()
-		fmt.Println(defaultOptions)
 		err = SaveOptions(defaultOptions)
 		if err != nil {
 			fmt.Println("❌ line 123 err ➡️", err)

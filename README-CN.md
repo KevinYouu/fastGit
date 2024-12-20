@@ -64,6 +64,8 @@ fastGit ps
 
 [go](https://github.com/golang/go)
 
+[cobra](https://github.com/spf13/cobra)
+
 [bubbletea](https://github.com/charmbracelet/bubbletea)
 
 [huh](https://github.com/charmbracelet/huh)

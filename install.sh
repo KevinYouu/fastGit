@@ -94,3 +94,9 @@ case $SHELL_TYPE in
     echo "Your shell is not supported."
     ;;
 esac
+
+# Initialize config
+if [ ! -d "/usr/local/bin/fastGit" ]; then
+    /usr/local/bin/fastGit init
+    echo "Config initialized successfully"
+fi

@@ -100,6 +100,6 @@ func incrementVersion(currentVersion string) string {
 		}
 	}
 
-	newVersion := fmt.Sprintf("%d.%d.%d", major, minor, patch)
+	newVersion := fmt.Sprintf("%s%d.%d.%d%s", maxPatch.Prefix, major, minor, patch, maxPatch.Suffix)
 	return newVersion
 }

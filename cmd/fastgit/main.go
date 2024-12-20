@@ -21,13 +21,6 @@ var rootCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(
 		&cobra.Command{
-			Use:   "c",
-			Short: "Clone a repository",
-			Run: func(cmd *cobra.Command, args []string) {
-				gitcmd.Clone()
-			},
-		},
-		&cobra.Command{
 			Use:   "pa",
 			Short: "Push all changes",
 			Run: func(cmd *cobra.Command, args []string) {
@@ -39,13 +32,6 @@ func init() {
 			Short: "Push selected changes",
 			Run: func(cmd *cobra.Command, args []string) {
 				gitcmd.PushSelected()
-			},
-		},
-		&cobra.Command{
-			Use:   "ra",
-			Short: "Add a remote",
-			Run: func(cmd *cobra.Command, args []string) {
-				gitcmd.AddRemote()
 			},
 		},
 		&cobra.Command{

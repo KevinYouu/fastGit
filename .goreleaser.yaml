@@ -12,8 +12,8 @@ builds:
     binary: fastGit
     ldflags:
       - -s -w -X github.com/KevinYouu/fastGit/pkg/components/version.Version={{.Version}}
-    # env:
-    #   - CGO_ENABLED=0
+    env:
+      - CGO_ENABLED=1
     goos:
       - linux
       - windows

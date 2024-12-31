@@ -8,9 +8,9 @@ import (
 	"reflect"
 	"strings"
 
-	_ "github.com/mattn/go-sqlite3"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	_ "modernc.org/sqlite"
 )
 
 // Get the path to the SQLite database
@@ -22,7 +22,7 @@ func getDBPath() string {
 // Open the SQLite database
 func openDB() (*sql.DB, error) {
 	dbPath := getDBPath()
-	db, err := sql.Open("sqlite3", dbPath)
+	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		return nil, err
 	}

@@ -86,22 +86,7 @@ echo "Installation completed successfully"
 
 rm "$file"
 
-SHELL_TYPE=$(echo "$SHELL" | awk -F/ '{print $NF}')
-
-case $SHELL_TYPE in
-"bash")
-    source "$HOME"/.bashrc
-    ;;
-"zsh")
-    source "$HOME"/.zshrc
-    ;;
-"fish")
-    source "$HOME/.config/fish/config.fish"
-    ;;
-*)
-    echo "Your shell is not supported."
-    ;;
-esac
+echo "Please restart your terminal or source your config manually."
 
 # Initialize config
 if [ ! -d "$install_dir/fastGit" ]; then

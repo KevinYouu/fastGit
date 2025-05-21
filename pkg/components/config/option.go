@@ -28,8 +28,14 @@ func GetOptions() ([]Option, error) {
 
 	rows, err := db.Query("SELECT label, value, usage FROM options ORDER BY usage DESC")
 	if err != nil {
-		fmt.Println("❌ line 31 err ➡️", err)
-		return nil, err
+		if initErr := Initialize(); initErr != nil {
+			return nil, fmt.Errorf("failed to initialize database: %v", initErr)
+		}
+		rows, err = db.Query("SELECT label, value, usage FROM options ORDER BY usage DESC")
+		if err != nil {
+			fmt.Println("❌ line 31 err ➡️", err)
+			return nil, err
+		}
 	}
 	defer rows.Close()
 

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 )
@@ -79,8 +80,6 @@ func UpdateSelf() error {
 		}
 		fmt.Println("Update script executed. Please restart fastGit manually.")
 		os.Exit(0)
-
-		return nil
 	}
 
 	version, err := getLatestVersion()
@@ -116,7 +115,7 @@ func UpdateSelf() error {
 
 	var newBinary []byte
 	for _, f := range zipReader.File {
-		if strings.HasPrefix(f.Name, "fastGit") {
+		if f.Name == "fastGit" {
 			rc, err := f.Open()
 			if err != nil {
 				return err
@@ -134,19 +133,31 @@ func UpdateSelf() error {
 		return fmt.Errorf("fastGit binary not found in zip")
 	}
 
+	// Find actual install path
 	execPath, err := os.Executable()
 	if err != nil {
 		return err
 	}
-
-	tmpPath := execPath + ".tmp"
-	if err := os.WriteFile(tmpPath, newBinary, 0755); err != nil {
+	resolvedPath, err := filepath.EvalSymlinks(execPath)
+	if err != nil {
 		return err
 	}
 
-	// Rename to replace the old binary
-	if err := os.Rename(tmpPath, execPath); err != nil {
-		return err
+	// Detect install dir: /opt/homebrew/bin or /usr/local/bin
+	targetPath := resolvedPath
+	if runtime.GOOS == "darwin" && runtime.GOARCH == "arm64" {
+		targetPath = "/opt/homebrew/bin/fastGit"
+	} else if strings.HasPrefix(resolvedPath, "/usr/local/bin/") {
+		targetPath = resolvedPath
+	}
+
+	tmpPath := targetPath + ".tmp"
+	if err := os.WriteFile(tmpPath, newBinary, 0755); err != nil {
+		return fmt.Errorf("write failed: %w (hint: try sudo)", err)
+	}
+
+	if err := os.Rename(tmpPath, targetPath); err != nil {
+		return fmt.Errorf("rename failed: %w (hint: try sudo)", err)
 	}
 
 	fmt.Println("Update completed successfully.")

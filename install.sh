@@ -4,17 +4,19 @@
 # Github: https://github.com/KevinYouu/fastGit
 
 repo="KevinYouu/fastGit"
+
 # Check if git is installed
 if ! command -v git &>/dev/null; then
     echo "git is not installed. Please install git first."
     echo "https://git-scm.com/downloads"
-    exit
+    exit 1
 fi
 
 version=$(curl -s https://api.github.com/repos/"$repo"/releases/latest | grep 'tag_name' | cut -d\" -f4)
 echo "latest version: $version"
 
 package_name=""
+install_dir="/usr/local/bin"
 
 function systemCheck() {
     system=$(uname -s)
@@ -24,10 +26,13 @@ function systemCheck() {
     Darwin)
         if [ "$arch" == "x86_64" ]; then
             package_name="darwin_amd64"
+            install_dir="/usr/local/bin"
         elif [ "$arch" == "arm64" ]; then
             package_name="darwin_arm64"
+            install_dir="/opt/homebrew/bin"
         else
             echo "Your system is not supported."
+            exit 1
         fi
         ;;
     Linux)
@@ -37,10 +42,12 @@ function systemCheck() {
             package_name="linux_arm64"
         else
             echo "Your system is not supported."
+            exit 1
         fi
         ;;
     *)
         echo "Your system is not supported."
+        exit 1
         ;;
     esac
 }
@@ -57,9 +64,10 @@ else
     echo "Download failed"
     exit 1
 fi
-echo "Extracting and installing $file"
 
-if sudo unzip -o "$file" -d /usr/local/bin/; then
+echo "Extracting and installing $file to $install_dir"
+
+if sudo unzip -o "$file" -d "$install_dir"; then
     echo "Extraction successful"
 else
     echo "Extraction failed"
@@ -67,7 +75,7 @@ else
 fi
 
 # Set permissions
-if sudo chmod +x "/usr/local/bin/fastGit"; then
+if sudo chmod +x "$install_dir/fastGit"; then
     echo "Permissions set successfully"
 else
     echo "Failed to set permissions"
@@ -96,7 +104,7 @@ case $SHELL_TYPE in
 esac
 
 # Initialize config
-if [ ! -d "/usr/local/bin/fastGit" ]; then
-    /usr/local/bin/fastGit init
+if [ ! -d "$install_dir/fastGit" ]; then
+    "$install_dir/fastGit" init
     echo "Config initialized successfully"
 fi

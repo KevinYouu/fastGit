@@ -19,7 +19,7 @@ func GetVersion() {
 
 	fmt.Println("Version:", colors.RenderColor("blue", Version))
 	fmt.Println("Github:", colors.RenderColor("blue", "https://github.com/KevinYouu/fastGit"))
-	fmt.Println("To know more about me, you can visit my blog:", colors.RenderColor("blue", "https://www.kevnu.com/about"))
+	fmt.Println("To know more about me, you can visit:", colors.RenderColor("blue", "https://www.kevnu.com/about"))
 }
 
 func GetLogo() {

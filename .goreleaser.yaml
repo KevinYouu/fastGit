@@ -23,9 +23,6 @@ builds:
     goarch:
       - amd64
       - arm64
-    ignore:
-      - goarch: arm64
-        goos: windows
 
 archives:
   - id: archive_noncgo

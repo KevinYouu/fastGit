@@ -32,6 +32,11 @@ curl -sSL https://raw.githubusercontent.com/KevinYouu/fastGit/main/install.sh | 
 wget -qO- https://raw.githubusercontent.com/KevinYouu/fastGit/main/install.sh | bash
 ```
 
+```bash
+# Windows
+iwr -useb https://raw.githubusercontent.com/KevinYouu/fastGit/main/install.ps1 | iex
+```
+
 #### 3. 运行
 
 ```bash

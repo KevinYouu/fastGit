@@ -24,12 +24,16 @@ brew install git
 ```bash
 # Linux/macOS
 curl -sSL https://raw.githubusercontent.com/KevinYouu/fastGit/main/install.sh | bash
+
+# or
+
+wget -qO- https://raw.githubusercontent.com/KevinYouu/fastGit/main/install.sh | bash
+
 ```
 
-or
-
-```bash
-wget -qO- https://raw.githubusercontent.com/KevinYouu/fastGit/main/install.sh | bash
+```powershell
+# Windows
+iwr -useb https://raw.githubusercontent.com/KevinYouu/fastGit/main/install.ps1 | iex
 ```
 
 #### 3. Run

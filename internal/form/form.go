@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"github.com/KevinYouu/fastGit/internal/colors"
+	"github.com/KevinYouu/fastGit/internal/theme"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 type FormProps struct {
@@ -40,12 +40,13 @@ const (
 	url
 )
 
-const (
-	hotPink = lipgloss.Color("#0091FF")
-)
-
+// 使用主题颜色
 var (
-	inputStyle = lipgloss.NewStyle().Foreground(hotPink)
+	titleStyle      = theme.TitleStyle
+	fieldLabelStyle = theme.InputStyle
+	focusedStyle    = theme.FocusedInputStyle
+	blurredStyle    = theme.InputStyle
+	inputStyle      = theme.InputStyle
 )
 
 type model struct {

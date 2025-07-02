@@ -7,12 +7,18 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/KevinYouu/fastGit/internal/colors"
+	"github.com/KevinYouu/fastGit/internal/command"
 	"github.com/KevinYouu/fastGit/internal/config"
 	"github.com/KevinYouu/fastGit/internal/form"
+	"github.com/KevinYouu/fastGit/internal/theme"
 )
 
 func CreateAndPushTag() error {
+	// 显示开始信息
+	fmt.Printf("%s %s\n",
+		theme.InfoStyle.Render("🏷️"),
+		theme.TitleStyle.Render("Creating and Pushing Git Tag"))
+
 	latestVersion, err := GetLatestTag()
 	if err != nil {
 		return fmt.Errorf("get latest tag error: %w", err)
@@ -29,20 +35,25 @@ func CreateAndPushTag() error {
 		return fmt.Errorf("get commit message error: %w", err)
 	}
 
-	cmd := exec.Command("git", "tag", "-a", version, "-m", commitMessage)
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("Failed to create tag: %s", string(output))
+	// 使用新的命令执行器
+	commands := []command.CommandInfo{
+		{
+			Command:     "git",
+			Args:        []string{"tag", "-a", version, "-m", commitMessage},
+			Description: "Creating annotated tag",
+			LoadingMsg:  "Creating tag...",
+			SuccessMsg:  fmt.Sprintf("Tag %s created successfully", version),
+		},
+		{
+			Command:     "git",
+			Args:        []string{"push", "origin", version},
+			Description: "Pushing tag to remote repository",
+			LoadingMsg:  "Pushing tag to remote...",
+			SuccessMsg:  fmt.Sprintf("Tag %s pushed successfully", version),
+		},
 	}
-	fmt.Println(string(output), colors.RenderColor("green", "Tag created successfully."))
 
-	cmd = exec.Command("git", "push", "origin", version)
-	output, err = cmd.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("Failed to push tag: %s", string(output))
-	}
-	fmt.Println(string(output), colors.RenderColor("green", "Tag pushed successfully."))
-	return nil
+	return command.RunMultipleCommands(commands)
 }
 
 func GetLatestTag() (string, error) {

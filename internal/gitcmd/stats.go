@@ -2,10 +2,10 @@ package gitcmd
 
 import (
 	"fmt"
-	"os/exec"
 	"strings"
 
 	"github.com/KevinYouu/fastGit/internal/colors"
+	"github.com/KevinYouu/fastGit/internal/command"
 )
 
 type FileStatus struct {
@@ -31,10 +31,9 @@ func statusColor(status string) string {
 }
 
 func getFileStatuses() ([]FileStatus, error) {
-	cmd := exec.Command("git", "status", "--porcelain")
-	output, err := cmd.Output()
+	output, err := command.RunCmdWithSpinner("git", []string{"status", "--porcelain"}, "Checking file status", "File status checked")
 	if err != nil {
-		return nil, fmt.Errorf("error executing command: %v", err)
+		return nil, fmt.Errorf("error executing git status command: %w", err)
 	}
 
 	lines := strings.Split(string(output), "\n")

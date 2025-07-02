@@ -8,6 +8,7 @@ require (
 	github.com/charmbracelet/huh v0.7.0
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/spf13/cobra v1.9.1
+	golang.org/x/term v0.32.0
 	golang.org/x/text v0.25.0
 	modernc.org/sqlite v1.37.1
 )

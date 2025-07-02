@@ -7,6 +7,7 @@ import (
 	"github.com/KevinYouu/fastGit/internal/config"
 	"github.com/KevinYouu/fastGit/internal/form"
 	"github.com/KevinYouu/fastGit/internal/logs"
+	"github.com/KevinYouu/fastGit/internal/theme"
 )
 
 func PushSelected() error {
@@ -37,6 +38,11 @@ func PushSelected() error {
 		logs.Error("No files selected.")
 		return nil
 	}
+
+	// 显示开始信息
+	fmt.Printf("%s",
+		theme.TitleStyle.Render("Starting Git Push Selected Process"))
+
 	options, err := config.GetOptions()
 	if err != nil {
 		logs.Error("Failed to get options:")
@@ -54,28 +60,37 @@ func PushSelected() error {
 		return fmt.Errorf("Input: %w", err)
 	}
 
-	output, err := command.RunCmd("git", append([]string{"add"}, data...), "Added files successfully.")
-	if err != nil {
-		logs.Error("Failed to add files: " + output)
-		return fmt.Errorf("git add: %s", output)
+	// 使用新的命令执行器执行Git操作
+	commands := []command.CommandInfo{
+		{
+			Command:     "git",
+			Args:        append([]string{"add"}, data...),
+			Description: "Adding selected files to staging area",
+			LoadingMsg:  "Adding selected files...",
+			SuccessMsg:  "Selected files added successfully",
+		},
+		{
+			Command:     "git",
+			Args:        []string{"commit", "-m", commitMessage},
+			Description: "Creating commit with message",
+			LoadingMsg:  "Creating commit...",
+			SuccessMsg:  "Commit created successfully",
+		},
+		{
+			Command:     "git",
+			Args:        []string{"pull"},
+			Description: "Pulling latest changes from remote",
+			LoadingMsg:  "Pulling changes...",
+			SuccessMsg:  "Pull completed successfully",
+		},
+		{
+			Command:     "git",
+			Args:        []string{"push"},
+			Description: "Pushing changes to remote repository",
+			LoadingMsg:  "Pushing to remote...",
+			SuccessMsg:  "Push completed successfully",
+		},
 	}
 
-	output, err = command.RunCmd("git", []string{"commit", "-m", commitMessage}, "Commit successfully.")
-	if err != nil {
-		logs.Error("Failed to commit: " + output)
-		return fmt.Errorf("git commit: %s", output)
-	}
-
-	output, err = command.RunCmd("git", []string{"pull"}, "Pulled successfully.")
-	if err != nil {
-		logs.Error("Failed to pull: " + output)
-		return fmt.Errorf("git pull: %s", output)
-	}
-
-	output, err = command.RunCmd("git", []string{"push"}, "Pushed successfully.")
-	if err != nil {
-		logs.Error("Failed to push: " + output)
-		return fmt.Errorf("git push: %s", output)
-	}
-	return nil
+	return command.RunMultipleCommands(commands)
 }

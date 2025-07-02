@@ -203,54 +203,9 @@ func RunCmdWithProgress(command string, args []string, loadingMsg, successMsg st
 
 // RunMultipleCommands 执行多个命令并显示整体进度
 func RunMultipleCommands(commands []CommandInfo) error {
-	total := len(commands)
-
-	// fmt.Printf("%s\n",
-	// 	theme.TitleStyle.Render("Executing commands..."))
-
-	for i, cmd := range commands {
-		progress := float64(i) / float64(total)
-
-		// 显示整体进度
-		fmt.Printf("\n%s Step %d/%d: %s\n",
-			theme.InfoStyle.Render("📋"),
-			i+1, total,
-			theme.DescriptionStyle.Render(cmd.Description))
-
-		// 显示进度条
-		width := 40
-		filled := int(progress * float64(width))
-		progressBar := ""
-		for j := 0; j < width; j++ {
-			if j < filled {
-				progressBar += "█"
-			} else {
-				progressBar += "░"
-			}
-		}
-
-		fmt.Printf("%s %.1f%%\n",
-			theme.ProgressStyle.Render(progressBar),
-			progress*100)
-
-		// 执行命令
-		_, err := RunCmdWithSpinner(cmd.Command, cmd.Args, cmd.LoadingMsg, cmd.SuccessMsg)
-		if err != nil {
-			return fmt.Errorf("command failed at step %d: %w", i+1, err)
-		}
-	}
-
-	// 显示最终完成状态
-	width := 40
-	progressBar := strings.Repeat("█", width)
-	fmt.Printf("\n%s 100.0%%\n",
-		theme.ProgressStyle.Render(progressBar))
-
-	fmt.Printf("%s %s\n",
-		theme.SuccessStyle.Render("🎉"),
-		theme.SuccessStyle.Render("All commands completed successfully!"))
-
-	return nil
+	// 使用基于官方 Bubble Tea spinner 的多步骤进度条
+	// 采用更简单、更可靠的实现
+	return RunMultipleCommandsWithSimpleProgress(commands)
 }
 
 // CommandInfo 命令信息结构

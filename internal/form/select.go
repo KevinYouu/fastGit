@@ -48,7 +48,7 @@ func SelectForm(title string, options []config.Option) (label, value string, err
 			huh.NewSelect[string]().
 				Height(compactHeight).
 				Title(title).
-				Description("↑/↓ 选择, Enter 确认").
+				// Description("↑/↓ 选择, Enter 确认").
 				Options(selectOpts...).
 				Value(&selectedValue),
 		),
@@ -101,7 +101,7 @@ func SelectFormWithStringSlice(title string, options []string) (label, value str
 			huh.NewSelect[string]().
 				Height(compactHeight).
 				Title(title).
-				Description("↑/↓ 选择, Enter 确认, q 退出").
+				// Description("↑/↓ 选择, Enter 确认, q 退出").
 				Options(selectOpts...).
 				Value(&selectedValue),
 		),

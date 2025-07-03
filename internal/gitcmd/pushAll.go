@@ -20,6 +20,7 @@ func PushAll() error {
 	if err != nil {
 		return fmt.Errorf("SelectForm: %w", err)
 	}
+	config.IncrementUsage(suffix)
 
 	commitMessage, err := form.Input("Enter your commit message: ", suffix+": ")
 	if err != nil {
@@ -58,12 +59,5 @@ func PushAll() error {
 		},
 	}
 
-	err = command.RunMultipleCommands(commands)
-	if err != nil {
-		return err
-	}
-
-	// 只有在所有Git操作都成功完成后才记录使用历史
-	config.IncrementUsage(suffix)
-	return nil
+	return command.RunMultipleCommands(commands)
 }

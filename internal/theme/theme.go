@@ -300,28 +300,34 @@ func GetCompactTheme(isCompact bool) *huh.Theme {
 	theme := huh.ThemeBase()
 
 	if isCompact {
-		// 紧凑模式：最小化边距和装饰，但保留底部边距
+		// 紧凑模式：最小化边距和装饰，完全移除顶部空白
 		theme.Focused.Base = lipgloss.NewStyle().
 			BorderStyle(lipgloss.NormalBorder()).
 			BorderForeground(PrimaryColor).
-			Padding(0, 1, 1, 1). // 上, 右, 下, 左 - 底部有1行内边距
-			Margin(0, 0, 1, 0)   // 底部有1行外边距
+			Padding(0, 1, 1, 1). // 上, 右, 下, 左 - 顶部0边距，底部有1行内边距
+			Margin(0, 0, 1, 0).  // 上, 右, 下, 左 - 顶部0边距，底部有1行外边距
+			MarginTop(0)         // 明确设置顶部边距为0
 
 		theme.Blurred.Base = lipgloss.NewStyle().
 			BorderStyle(lipgloss.NormalBorder()).
 			BorderForeground(BorderColor).
-			Padding(0, 1, 1, 1). // 上, 右, 下, 左 - 底部有1行内边距
-			Margin(0, 0, 1, 0)   // 底部有1行外边距
+			Padding(0, 1, 1, 1). // 上, 右, 下, 左 - 顶部0边距，底部有1行内边距
+			Margin(0, 0, 1, 0).  // 上, 右, 下, 左 - 顶部0边距，底部有1行外边距
+			MarginTop(0)         // 明确设置顶部边距为0
 
-		// 紧凑标题样式 - 无顶部边距
+		// 紧凑标题样式 - 完全无边距
 		theme.Focused.Title = lipgloss.NewStyle().
 			Foreground(PrimaryColor).
 			Bold(true).
-			Margin(0) // 无边距
+			Margin(0).    // 无边距
+			MarginTop(0). // 明确设置顶部边距为0
+			PaddingTop(0) // 明确设置顶部内边距为0
 
 		theme.Blurred.Title = lipgloss.NewStyle().
 			Foreground(TextMuted).
-			Margin(0) // 无边距
+			Margin(0).    // 无边距
+			MarginTop(0). // 明确设置顶部边距为0
+			PaddingTop(0) // 明确设置顶部内边距为0
 
 		// 紧凑描述样式
 		theme.Focused.Description = lipgloss.NewStyle().
@@ -414,28 +420,34 @@ func GetCompactTheme(isCompact bool) *huh.Theme {
 func GetUltraCompactTheme() *huh.Theme {
 	theme := huh.ThemeBase()
 
-	// 超紧凑基础样式：无边框，但保留底部边距
+	// 超紧凑基础样式：无边框，完全移除顶部空白
 	theme.Focused.Base = lipgloss.NewStyle().
 		BorderStyle(lipgloss.HiddenBorder()).
-		Padding(0, 0, 1, 0). // 底部有1行内边距
-		Margin(0, 0, 1, 0)   // 底部有1行外边距
+		Padding(0, 0, 1, 0). // 顶部0边距，底部有1行内边距
+		Margin(0, 0, 1, 0).  // 顶部0边距，底部有1行外边距
+		MarginTop(0)         // 明确设置顶部边距为0
 
 	theme.Blurred.Base = lipgloss.NewStyle().
 		BorderStyle(lipgloss.HiddenBorder()).
-		Padding(0, 0, 1, 0). // 底部有1行内边距
-		Margin(0, 0, 1, 0)   // 底部有1行外边距
+		Padding(0, 0, 1, 0). // 顶部0边距，底部有1行内边距
+		Margin(0, 0, 1, 0).  // 顶部0边距，底部有1行外边距
+		MarginTop(0)         // 明确设置顶部边距为0
 
-	// 超紧凑标题：单行，无装饰
+	// 超紧凑标题：单行，无装饰，完全无边距
 	theme.Focused.Title = lipgloss.NewStyle().
 		Foreground(PrimaryColor).
 		Bold(true).
 		Padding(0).
-		Margin(0)
+		Margin(0).
+		MarginTop(0). // 明确设置顶部边距为0
+		PaddingTop(0) // 明确设置顶部内边距为0
 
 	theme.Blurred.Title = lipgloss.NewStyle().
 		Foreground(TextMuted).
 		Padding(0).
-		Margin(0)
+		Margin(0).
+		MarginTop(0). // 明确设置顶部边距为0
+		PaddingTop(0) // 明确设置顶部内边距为0
 
 	// 隐藏描述文本，因为要移到右侧显示
 	theme.Focused.Description = lipgloss.NewStyle().

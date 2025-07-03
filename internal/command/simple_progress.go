@@ -132,7 +132,7 @@ func (m *CommandStepModel) View() string {
 	s.WriteString(lipgloss.NewStyle().
 		Bold(true).
 		Foreground(theme.PrimaryColor).
-		Render("🚀 Executing Commands"))
+		Render("🚀 Executing Commands\n"))
 
 	// 进度条
 	progress := float64(m.currentStep) / float64(m.totalSteps)
@@ -143,7 +143,7 @@ func (m *CommandStepModel) View() string {
 	width := 40
 	filled := int(progress * float64(width))
 	bar := ""
-	for i := 0; i < width; i++ {
+	for i := range width {
 		if i < filled {
 			bar += "█"
 		} else {

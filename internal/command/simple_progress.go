@@ -133,7 +133,6 @@ func (m *CommandStepModel) View() string {
 		Bold(true).
 		Foreground(theme.PrimaryColor).
 		Render("🚀 Executing Commands"))
-	s.WriteString("\n\n")
 
 	// 进度条
 	progress := float64(m.currentStep) / float64(m.totalSteps)
@@ -200,11 +199,6 @@ func (m *CommandStepModel) View() string {
 				Foreground(theme.ErrorColor).
 				Bold(true).
 				Render("Process failed"))
-		} else {
-			s.WriteString(lipgloss.NewStyle().
-				Foreground(theme.SuccessColor).
-				Bold(true).
-				Render("🎉 All commands completed successfully!"))
 		}
 	}
 
@@ -248,6 +242,8 @@ func RunMultipleCommandsWithSimpleProgress(commands []CommandInfo) error {
 		if m.err != nil {
 			return m.err
 		}
+		// 所有命令成功后，直接输出成功提示到屏幕
+		fmt.Println("🎉 All commands completed successfully!")
 	}
 
 	return nil

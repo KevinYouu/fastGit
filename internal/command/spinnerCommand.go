@@ -203,8 +203,6 @@ func RunCmdWithProgress(command string, args []string, loadingMsg, successMsg st
 
 // RunMultipleCommands 执行多个命令并显示整体进度
 func RunMultipleCommands(commands []CommandInfo) error {
-	// 使用基于官方 Bubble Tea spinner 的多步骤进度条
-	// 采用更简单、更可靠的实现
 	return RunMultipleCommandsWithSimpleProgress(commands)
 }
 

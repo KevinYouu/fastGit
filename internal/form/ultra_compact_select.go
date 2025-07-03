@@ -2,12 +2,10 @@ package form
 
 import (
 	"os"
-	"strings"
 
 	"github.com/KevinYouu/fastGit/internal/config"
 	"github.com/KevinYouu/fastGit/internal/theme"
 	"github.com/charmbracelet/huh"
-	"github.com/charmbracelet/lipgloss"
 	"golang.org/x/term"
 )
 
@@ -21,10 +19,10 @@ func UltraCompactSelectForm(title string, options []config.Option) (label, value
 		selectOpts[i] = huh.NewOption(opt.Label, opt.Value)
 	}
 
-	// 获取终端宽度来调整布局
-	width, height, err := term.GetSize(int(os.Stdout.Fd()))
+	// 获取终端高度来调整布局
+	_, height, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil {
-		width, height = 80, 24
+		height = 24
 	}
 
 	// 计算选择区域的高度
@@ -38,9 +36,8 @@ func UltraCompactSelectForm(title string, options []config.Option) (label, value
 
 	selectHeight := min(len(options), maxHeight)
 
-	// 创建带有右侧提示信息的标题
-	helpText := "↑/↓:选择 Enter:确认 q:退出"
-	titleWithHelp := createTitleWithRightHelp(title, helpText, width)
+	// 创建标题（不包含帮助信息）
+	titleWithHelp := title
 
 	form := huh.NewForm(
 		huh.NewGroup(
@@ -49,9 +46,11 @@ func UltraCompactSelectForm(title string, options []config.Option) (label, value
 				Title(titleWithHelp).
 				Description(""). // 清空描述，因为已经在标题中显示
 				Options(selectOpts...).
-				Value(&selectedValue),
+				Value(&selectedValue).
+				Filtering(false), // 禁用过滤功能和相关提示
 		),
-	).WithTheme(theme.GetUltraCompactTheme())
+	).WithTheme(theme.GetUltraCompactTheme()).
+		WithShowHelp(false) // 禁用帮助信息
 
 	err = form.Run()
 	if err != nil {
@@ -77,10 +76,10 @@ func UltraCompactSelectFormWithStringSlice(title string, options []string) (labe
 		selectOpts[i] = huh.NewOption(opt, opt)
 	}
 
-	// 获取终端宽度来调整布局
-	width, height, err := term.GetSize(int(os.Stdout.Fd()))
+	// 获取终端高度来调整布局
+	_, height, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil {
-		width, height = 80, 24
+		height = 24
 	}
 
 	// 计算选择区域的高度
@@ -94,9 +93,8 @@ func UltraCompactSelectFormWithStringSlice(title string, options []string) (labe
 
 	selectHeight := min(len(options), maxHeight)
 
-	// 创建带有右侧提示信息的标题
-	helpText := "↑/↓:选择 Enter:确认 q:退出"
-	titleWithHelp := createTitleWithRightHelp(title, helpText, width)
+	// 创建标题（不包含帮助信息）
+	titleWithHelp := title
 
 	form := huh.NewForm(
 		huh.NewGroup(
@@ -105,9 +103,11 @@ func UltraCompactSelectFormWithStringSlice(title string, options []string) (labe
 				Title(titleWithHelp).
 				Description(""). // 清空描述
 				Options(selectOpts...).
-				Value(&selectedValue),
+				Value(&selectedValue).
+				Filtering(false), // 禁用过滤功能和相关提示
 		),
-	).WithTheme(theme.GetUltraCompactTheme())
+	).WithTheme(theme.GetUltraCompactTheme()).
+		WithShowHelp(false) // 禁用帮助信息
 
 	err = form.Run()
 	if err != nil {
@@ -115,41 +115,4 @@ func UltraCompactSelectFormWithStringSlice(title string, options []string) (labe
 	}
 
 	return selectedValue, selectedValue, nil
-}
-
-// createTitleWithRightHelp 创建带有右侧帮助信息的标题
-func createTitleWithRightHelp(title, helpText string, terminalWidth int) string {
-	if terminalWidth < 60 {
-		// 终端太窄，只显示标题
-		return title
-	}
-
-	titleLen := len(title)
-	helpLen := len(helpText)
-
-	// 计算需要的空格数
-	spacesNeeded := terminalWidth - titleLen - helpLen - 4 // 预留4个字符的缓冲
-	if spacesNeeded < 2 {
-		spacesNeeded = 2
-	}
-
-	// 创建标题和帮助信息的布局
-	titleStyle := lipgloss.NewStyle().
-		Foreground(theme.PrimaryColor).
-		Bold(true)
-
-	helpStyle := lipgloss.NewStyle().
-		Foreground(theme.TextSecondary).
-		Bold(false)
-
-	// 使用 lipgloss 创建左右对齐的布局
-	leftPart := titleStyle.Render(title)
-	rightPart := helpStyle.Render(helpText)
-
-	return lipgloss.JoinHorizontal(
-		lipgloss.Left,
-		leftPart,
-		strings.Repeat(" ", spacesNeeded),
-		rightPart,
-	)
 }

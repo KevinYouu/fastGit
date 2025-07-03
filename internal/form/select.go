@@ -37,22 +37,22 @@ func SelectForm(title string, options []config.Option) (label, value string, err
 	}
 
 	// 计算合适的高度，确保最后一项可见
-	availableHeight := height - 6                         // 预留标题、描述、边框等空间
-	compactHeight := min(len(options)+1, availableHeight) // +1 确保有额外空间
-	if compactHeight < 3 {
-		compactHeight = 3
-	}
+	availableHeight := height - 6 // 预留标题、描述、边框等空间
+	compactHeight := max(
+		// +1 确保有额外空间
+		min(len(options)+1, availableHeight), 3)
 
 	form := huh.NewForm(
 		huh.NewGroup(
 			huh.NewSelect[string]().
 				Height(compactHeight).
 				Title(title).
-				// Description("↑/↓ 选择, Enter 确认").
 				Options(selectOpts...).
-				Value(&selectedValue),
+				Value(&selectedValue).
+				Filtering(false), // 禁用过滤功能和相关提示
 		),
-	).WithTheme(theme.GetCompactTheme(true))
+	).WithTheme(theme.GetCompactTheme(true)).
+		WithShowHelp(false) // 禁用帮助信息
 
 	err = form.Run()
 	if err != nil {
@@ -90,11 +90,10 @@ func SelectFormWithStringSlice(title string, options []string) (label, value str
 	}
 
 	// 计算合适的高度，确保最后一项可见
-	availableHeight := height - 6                         // 预留标题、描述、边框等空间
-	compactHeight := min(len(options)+1, availableHeight) // +1 确保有额外空间
-	if compactHeight < 3 {
-		compactHeight = 3
-	}
+	availableHeight := height - 6 // 预留标题、描述、边框等空间
+	compactHeight := max(
+		// +1 确保有额外空间
+		min(len(options)+1, availableHeight), 3)
 
 	form := huh.NewForm(
 		huh.NewGroup(
@@ -103,9 +102,11 @@ func SelectFormWithStringSlice(title string, options []string) (label, value str
 				Title(title).
 				// Description("↑/↓ 选择, Enter 确认, q 退出").
 				Options(selectOpts...).
-				Value(&selectedValue),
+				Value(&selectedValue).
+				Filtering(false), // 禁用过滤功能和相关提示
 		),
-	).WithTheme(theme.GetCompactTheme(true))
+	).WithTheme(theme.GetCompactTheme(true)).
+		WithShowHelp(false) // 禁用帮助信息
 
 	err = form.Run()
 	if err != nil {

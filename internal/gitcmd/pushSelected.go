@@ -53,7 +53,6 @@ func PushSelected() error {
 	if err != nil {
 		return fmt.Errorf("SelectForm: %w", err)
 	}
-	config.IncrementUsage(suffix)
 
 	commitMessage, err := form.Input("Enter your commit message: ", suffix+": ")
 	if err != nil {
@@ -92,5 +91,12 @@ func PushSelected() error {
 		},
 	}
 
-	return command.RunMultipleCommands(commands)
+	err = command.RunMultipleCommands(commands)
+	if err != nil {
+		return err
+	}
+
+	// 只有在所有Git操作都成功完成后才记录使用历史
+	config.IncrementUsage(suffix)
+	return nil
 }

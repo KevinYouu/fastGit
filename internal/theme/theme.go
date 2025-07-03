@@ -300,24 +300,28 @@ func GetCompactTheme(isCompact bool) *huh.Theme {
 	theme := huh.ThemeBase()
 
 	if isCompact {
-		// 紧凑模式：最小化边距和装饰
+		// 紧凑模式：最小化边距和装饰，但保留底部边距
 		theme.Focused.Base = lipgloss.NewStyle().
 			BorderStyle(lipgloss.NormalBorder()).
 			BorderForeground(PrimaryColor).
-			Padding(0, 1)
+			Padding(0, 1, 1, 1). // 上, 右, 下, 左 - 底部有1行内边距
+			Margin(0, 0, 1, 0)   // 底部有1行外边距
 
 		theme.Blurred.Base = lipgloss.NewStyle().
 			BorderStyle(lipgloss.NormalBorder()).
 			BorderForeground(BorderColor).
-			Padding(0, 1)
+			Padding(0, 1, 1, 1). // 上, 右, 下, 左 - 底部有1行内边距
+			Margin(0, 0, 1, 0)   // 底部有1行外边距
 
-		// 紧凑标题样式
+		// 紧凑标题样式 - 无顶部边距
 		theme.Focused.Title = lipgloss.NewStyle().
 			Foreground(PrimaryColor).
-			Bold(true)
+			Bold(true).
+			Margin(0) // 无边距
 
 		theme.Blurred.Title = lipgloss.NewStyle().
-			Foreground(TextMuted)
+			Foreground(TextMuted).
+			Margin(0) // 无边距
 
 		// 紧凑描述样式
 		theme.Focused.Description = lipgloss.NewStyle().
@@ -410,16 +414,16 @@ func GetCompactTheme(isCompact bool) *huh.Theme {
 func GetUltraCompactTheme() *huh.Theme {
 	theme := huh.ThemeBase()
 
-	// 超紧凑基础样式：无边距无内边距
+	// 超紧凑基础样式：无边框，但保留底部边距
 	theme.Focused.Base = lipgloss.NewStyle().
 		BorderStyle(lipgloss.HiddenBorder()).
-		Padding(0).
-		Margin(0)
+		Padding(0, 0, 1, 0). // 底部有1行内边距
+		Margin(0, 0, 1, 0)   // 底部有1行外边距
 
 	theme.Blurred.Base = lipgloss.NewStyle().
 		BorderStyle(lipgloss.HiddenBorder()).
-		Padding(0).
-		Margin(0)
+		Padding(0, 0, 1, 0). // 底部有1行内边距
+		Margin(0, 0, 1, 0)   // 底部有1行外边距
 
 	// 超紧凑标题：单行，无装饰
 	theme.Focused.Title = lipgloss.NewStyle().

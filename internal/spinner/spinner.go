@@ -7,7 +7,6 @@ import (
 	"github.com/KevinYouu/fastGit/internal/theme"
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 // SpinnerModel 加载动画模型
@@ -81,105 +80,6 @@ func (m SpinnerModel) View() string {
 	return fmt.Sprintf("%s %s",
 		m.spinner.View(),
 		theme.InfoStyle.Render(m.message))
-}
-
-// SpinnerWithProgress 带进度的加载动画
-type SpinnerWithProgress struct {
-	spinner   spinner.Model
-	message   string
-	progress  float64
-	done      bool
-	success   bool
-	err       error
-	resultMsg string
-}
-
-// NewSpinnerWithProgress 创建带进度的加载动画
-func NewSpinnerWithProgress(message string) SpinnerWithProgress {
-	s := spinner.New()
-	s.Spinner = spinner.Spinner{
-		Frames: theme.GetSpinnerFrames(),
-		FPS:    time.Millisecond * 100,
-	}
-	s.Style = theme.GetSpinnerStyle()
-
-	return SpinnerWithProgress{
-		spinner: s,
-		message: message,
-	}
-}
-
-// SetProgress 设置进度
-func (m *SpinnerWithProgress) SetProgress(progress float64) {
-	m.progress = progress
-}
-
-// SetMessage 设置消息
-func (m *SpinnerWithProgress) SetMessage(message string) {
-	m.message = message
-}
-
-// SetDone 设置完成状态
-func (m *SpinnerWithProgress) SetDone(success bool, resultMsg string, err error) {
-	m.done = true
-	m.success = success
-	m.resultMsg = resultMsg
-	m.err = err
-}
-
-// Init 初始化
-func (m SpinnerWithProgress) Init() tea.Cmd {
-	return m.spinner.Tick
-}
-
-// Update 更新
-func (m SpinnerWithProgress) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	var cmd tea.Cmd
-	m.spinner, cmd = m.spinner.Update(msg)
-	return m, cmd
-}
-
-// View 渲染
-func (m SpinnerWithProgress) View() string {
-	if m.done {
-		if m.success {
-			return fmt.Sprintf("%s %s\n",
-				theme.SuccessStyle.Render("✓"),
-				theme.SuccessStyle.Render(m.resultMsg))
-		} else {
-			errorMsg := m.resultMsg
-			if m.err != nil {
-				errorMsg = fmt.Sprintf("%s: %v", m.resultMsg, m.err)
-			}
-			return fmt.Sprintf("%s %s\n",
-				theme.ErrorStyle.Render("✗"),
-				theme.ErrorStyle.Render(errorMsg))
-		}
-	}
-
-	// 创建进度条
-	width := 30
-	filled := int(m.progress * float64(width))
-	progressBar := ""
-	for i := 0; i < width; i++ {
-		if i < filled {
-			progressBar += "█"
-		} else {
-			progressBar += "░"
-		}
-	}
-
-	progressStyle := lipgloss.NewStyle().
-		Foreground(theme.PrimaryColor).
-		Background(theme.BackgroundLighter).
-		Padding(0, 1)
-
-	return fmt.Sprintf("%s %s\n%s %s %.1f%%",
-		m.spinner.View(),
-		theme.InfoStyle.Render(m.message),
-		progressStyle.Render(progressBar),
-		lipgloss.NewStyle().Foreground(theme.TextSecondary).Render("Progress:"),
-		m.progress*100)
 }
 
 // SimpleSpinner 简单的加载动画函数

@@ -59,5 +59,5 @@ func PushAll() error {
 		},
 	}
 
-	return command.RunMultipleCommands(commands)
+	return command.RunMultipleCommandsWithBubbleTea(commands)
 }

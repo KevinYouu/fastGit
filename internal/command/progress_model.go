@@ -11,7 +11,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// ProgressModel 多步骤进度显示模型
+// ProgressModel 多步骤进度显示模型 - 统一的进度条组件
 type ProgressModel struct {
 	commands     []CommandInfo
 	currentStep  int
@@ -22,6 +22,26 @@ type ProgressModel struct {
 	errorMessage string
 	results      []string
 	executing    bool
+
+	// Spinner 相关字段
+	showSpinner bool
+	spinner     spinnerAnimation
+	frame       int
+
+	// 步骤状态跟踪
+	stepStatus []int // 0=pending, 1=running, 2=success, 3=failed
+}
+
+// spinnerAnimation 实现简单的加载动画
+type spinnerAnimation struct {
+	frames []string
+	fps    time.Duration
+}
+
+// 默认加载动画
+var defaultSpinnerAnimation = spinnerAnimation{
+	frames: theme.GetSpinnerFrames(),
+	fps:    time.Second / 10,
 }
 
 // StepStartMsg 步骤开始消息
@@ -53,21 +73,69 @@ func NewProgressModel(commands []CommandInfo) *ProgressModel {
 		isCompleted: false,
 		results:     make([]string, len(commands)),
 		executing:   false,
+		showSpinner: true,
+		spinner:     defaultSpinnerAnimation,
+		stepStatus:  make([]int, len(commands)),
 	}
 }
 
+// NewProgressModelWithoutSpinner 创建不带spinner的进度模型
+func NewProgressModelWithoutSpinner(commands []CommandInfo) *ProgressModel {
+	model := NewProgressModel(commands)
+	model.showSpinner = false
+	return model
+}
+
+// tickMsg 动画帧消息
+type tickMsg time.Time
+
 // Init 初始化
 func (m *ProgressModel) Init() tea.Cmd {
+	if m.showSpinner {
+		return tea.Batch(
+			m.executeNextCommand(),
+			m.tickCmd(),
+		)
+	}
 	return m.executeNextCommand()
+}
+
+// tickCmd 帧更新命令
+func (m *ProgressModel) tickCmd() tea.Cmd {
+	return tea.Tick(m.spinner.fps, func(t time.Time) tea.Msg {
+		return tickMsg(t)
+	})
 }
 
 // Update 更新状态
 func (m *ProgressModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		if msg.String() == "q" || msg.String() == "ctrl+c" {
+			return m, tea.Quit
+		}
+		return m, nil
+
+	case tickMsg:
+		if m.showSpinner {
+			// 更新加载动画帧
+			m.frame = (m.frame + 1) % len(m.spinner.frames)
+			if m.isCompleted {
+				return m, tea.Tick(time.Second, func(time.Time) tea.Msg {
+					return tea.Quit()
+				})
+			}
+			return m, m.tickCmd()
+		}
+		return m, nil
+
 	case StepStartMsg:
 		m.currentStep = msg.Step
 		m.status = fmt.Sprintf("Executing: %s", msg.Description)
 		m.executing = true
+		if len(m.stepStatus) > msg.Step {
+			m.stepStatus[msg.Step] = 1 // 标记为运行中
+		}
 		// 开始执行命令
 		return m, m.executeCommand(msg.Step)
 
@@ -75,6 +143,9 @@ func (m *ProgressModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.results[msg.Step] = msg.Output
 		if msg.Success {
 			m.status = fmt.Sprintf("Completed: %s", m.commands[msg.Step].Description)
+			if len(m.stepStatus) > msg.Step {
+				m.stepStatus[msg.Step] = 2 // 标记为成功
+			}
 			m.currentStep = msg.Step + 1 // 更新到下一步
 			// 继续下一个命令
 			if msg.Step+1 < m.total {
@@ -88,6 +159,9 @@ func (m *ProgressModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.hasError = true
 			m.errorMessage = msg.Error.Error()
 			m.status = fmt.Sprintf("Failed: %s", m.commands[msg.Step].Description)
+			if len(m.stepStatus) > msg.Step {
+				m.stepStatus[msg.Step] = 3 // 标记为失败
+			}
 			return m, func() tea.Msg { return AllCompleteMsg{Success: false} }
 		}
 
@@ -101,11 +175,6 @@ func (m *ProgressModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Tick(time.Second, func(time.Time) tea.Msg {
 			return tea.Quit()
 		})
-
-	case tea.KeyMsg:
-		if msg.String() == "ctrl+c" {
-			return m, tea.Quit
-		}
 	}
 
 	return m, nil
@@ -171,18 +240,45 @@ func (m *ProgressModel) View() string {
 		var icon string
 		var style lipgloss.Style
 
-		if i < m.currentStep {
-			icon = "✓"
-			style = theme.SuccessStyle
-		} else if i == m.currentStep && m.executing {
-			icon = "▶"
-			style = theme.InfoStyle
-		} else if i == m.currentStep && m.hasError {
-			icon = "✗"
-			style = theme.ErrorStyle
+		if len(m.stepStatus) > 0 {
+			// 使用详细的步骤状态
+			switch m.stepStatus[i] {
+			case 0: // 等待
+				icon = "○"
+				style = lipgloss.NewStyle().Foreground(theme.TextSecondary)
+			case 1: // 运行中
+				if m.showSpinner {
+					icon = m.spinner.frames[m.frame]
+				} else {
+					icon = "▶"
+				}
+				style = lipgloss.NewStyle().Foreground(theme.PrimaryColor)
+			case 2: // 成功
+				icon = "✓"
+				style = lipgloss.NewStyle().Foreground(theme.SuccessColor)
+			case 3: // 失败
+				icon = "✗"
+				style = lipgloss.NewStyle().Foreground(theme.ErrorColor)
+			}
 		} else {
-			icon = "○"
-			style = lipgloss.NewStyle().Foreground(theme.TextSecondary)
+			// 使用简单的步骤状态（向后兼容）
+			if i < m.currentStep {
+				icon = "✓"
+				style = theme.SuccessStyle
+			} else if i == m.currentStep && m.executing {
+				if m.showSpinner {
+					icon = m.spinner.frames[m.frame]
+				} else {
+					icon = "▶"
+				}
+				style = theme.InfoStyle
+			} else if i == m.currentStep && m.hasError {
+				icon = "✗"
+				style = theme.ErrorStyle
+			} else {
+				icon = "○"
+				style = lipgloss.NewStyle().Foreground(theme.TextSecondary)
+			}
 		}
 
 		s.WriteString(fmt.Sprintf("  %s %s\n",
@@ -263,4 +359,14 @@ func RunMultipleCommandsWithBubbleTea(commands []CommandInfo) error {
 	}
 
 	return nil
+}
+
+// RunMultipleCommandsWithProgress 使用 Bubble Tea 执行多个命令（别名，保持向后兼容）
+func RunMultipleCommandsWithProgress(commands []CommandInfo) error {
+	return RunMultipleCommandsWithBubbleTea(commands)
+}
+
+// RunMultipleCommandsWithSimpleProgress 使用统一的进度条组件执行多个命令（别名，保持向后兼容）
+func RunMultipleCommandsWithSimpleProgress(commands []CommandInfo) error {
+	return RunMultipleCommandsWithBubbleTea(commands)
 }

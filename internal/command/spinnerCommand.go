@@ -203,7 +203,7 @@ func RunCmdWithProgress(command string, args []string, loadingMsg, successMsg st
 
 // RunMultipleCommands 执行多个命令并显示整体进度
 func RunMultipleCommands(commands []CommandInfo) error {
-	return RunMultipleCommandsWithSimpleProgress(commands)
+	return RunMultipleCommandsWithBubbleTea(commands)
 }
 
 // CommandInfo 命令信息结构
@@ -261,66 +261,22 @@ func RunCmdWithAdvancedSpinner(command string, args []string, loadingMsg, succes
 	return output, err
 }
 
-// RunMultiStepCommand 执行多步骤命令
+// RunMultiStepCommand 执行多步骤命令，使用统一的进度条组件
 func RunMultiStepCommand(steps []MultiStepInfo) error {
-	stepNames := make([]string, len(steps))
-	stepMessages := make([]string, len(steps))
-
+	// 将 MultiStepInfo 转换为 CommandInfo
+	commands := make([]CommandInfo, len(steps))
 	for i, step := range steps {
-		stepNames[i] = step.Name
-		stepMessages[i] = step.Description
+		commands[i] = CommandInfo{
+			Command:     step.Command,
+			Args:        step.Args,
+			Description: step.Description,
+			LoadingMsg:  step.LoadingMsg,
+			SuccessMsg:  fmt.Sprintf("Completed: %s", step.Description),
+		}
 	}
 
-	// 创建多步骤 spinner
-	multiSpinner := spinner.NewMultiStepSpinner(stepNames, stepMessages)
-
-	// 创建 tea 程序
-	p := tea.NewProgram(multiSpinner.GetSpinner())
-
-	done := make(chan bool)
-	errorChan := make(chan error)
-
-	// 在后台执行所有步骤
-	go func() {
-		var finalErr error
-
-		for i, step := range steps {
-			// 更新当前步骤
-			multiSpinner.ExecuteStep(i, step.LoadingMsg)
-
-			// 执行命令
-			_, err := exec.Command(step.Command, step.Args...).CombinedOutput()
-			if err != nil {
-				multiSpinner.Complete(false, fmt.Sprintf("Failed at step: %s", step.Name), err)
-				finalErr = fmt.Errorf("step %d (%s) failed: %w", i+1, step.Name, err)
-				break
-			}
-
-			// 添加延迟让用户看到进度
-			time.Sleep(500 * time.Millisecond)
-		}
-
-		if finalErr == nil {
-			multiSpinner.Complete(true, "All steps completed successfully!", nil)
-		}
-
-		// 等待一秒让用户看到最终结果
-		time.Sleep(2 * time.Second)
-
-		done <- true
-		errorChan <- finalErr
-	}()
-
-	// 启动 tea 程序显示动画
-	go func() {
-		p.Run()
-	}()
-
-	// 等待完成
-	<-done
-	p.Quit()
-
-	return <-errorChan
+	// 使用统一的进度条组件
+	return RunMultipleCommandsWithBubbleTea(commands)
 }
 
 // MultiStepInfo 多步骤信息结构

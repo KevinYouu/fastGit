@@ -20,6 +20,7 @@ func init() {
 		commands.RemotesCommand(),
 		commands.ResetCommand(),
 		commands.TagCommand(),
+		commands.TagDeleteCommand(),
 		commands.StatusCommand(),
 		commands.MergeCommand(),
 		commands.VersionCommand(),

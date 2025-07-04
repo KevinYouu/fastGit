@@ -201,11 +201,6 @@ func RunCmdWithProgress(command string, args []string, loadingMsg, successMsg st
 	return output, nil
 }
 
-// RunMultipleCommands 执行多个命令并显示整体进度
-func RunMultipleCommands(commands []CommandInfo) error {
-	return RunMultipleCommandsWithBubbleTea(commands)
-}
-
 // CommandInfo 命令信息结构
 type CommandInfo struct {
 	Command     string

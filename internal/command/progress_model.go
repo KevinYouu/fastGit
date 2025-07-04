@@ -204,14 +204,12 @@ func (m *ProgressModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *ProgressModel) View() string {
 	var s strings.Builder
 
-	// 标题
+	// 标题 - 去掉多余的边距和空行
 	titleStyle := lipgloss.NewStyle().
 		Foreground(theme.PrimaryColor).
-		Bold(true).
-		Padding(1, 2).
-		MarginBottom(1)
+		Bold(true)
 	s.WriteString(titleStyle.Render("Executing commands..."))
-	s.WriteString("\n\n")
+	s.WriteString("\n")
 
 	// 进度条
 	progress := float64(m.currentStep) / float64(m.total)
@@ -444,5 +442,10 @@ func RunMultipleCommandsWithProgress(commands []CommandInfo) error {
 
 // RunMultipleCommandsWithSimpleProgress 使用统一的进度条组件执行多个命令（别名，保持向后兼容）
 func RunMultipleCommandsWithSimpleProgress(commands []CommandInfo) error {
+	return RunMultipleCommandsWithBubbleTea(commands)
+}
+
+// RunMultipleCommands 主要入口函数 - 使用 Bubble Tea 执行多个命令
+func RunMultipleCommands(commands []CommandInfo) error {
 	return RunMultipleCommandsWithBubbleTea(commands)
 }

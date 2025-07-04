@@ -15,7 +15,7 @@ func Confirm(title string) bool {
 				Title(title).
 				Value(&confirmed),
 		),
-	).WithTheme(theme.GetCompactTheme(true)).
+	).WithTheme(theme.GetCompactTheme()).
 		WithShowHelp(false) // 尝试禁用帮助
 
 	err := form.Run()

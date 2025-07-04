@@ -46,7 +46,7 @@ func MultiSelectForm(title string, options []string) (Values []string, err error
 				Options(selectOpts...).
 				Value(&selectedValues),
 		),
-	).WithTheme(theme.GetCompactTheme(true))
+	).WithTheme(theme.GetCompactTheme())
 
 	err = form.Run()
 	if err != nil {

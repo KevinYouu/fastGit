@@ -15,7 +15,6 @@ func Input(title string, defaultValue string) (string, error) {
 		huh.NewGroup(
 			huh.NewInput().
 				Title(title).
-				Description("输入后按 Enter").
 				Placeholder("请输入...").
 				Value(&inputValue).
 				Validate(func(str string) error {
@@ -25,7 +24,7 @@ func Input(title string, defaultValue string) (string, error) {
 					return nil
 				}),
 		),
-	).WithTheme(theme.GetCompactTheme(true))
+	).WithTheme(theme.GetCompactTheme())
 
 	err := form.Run()
 	if err != nil {

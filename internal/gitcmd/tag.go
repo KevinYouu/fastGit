@@ -10,15 +10,9 @@ import (
 	"github.com/KevinYouu/fastGit/internal/command"
 	"github.com/KevinYouu/fastGit/internal/config"
 	"github.com/KevinYouu/fastGit/internal/form"
-	"github.com/KevinYouu/fastGit/internal/theme"
 )
 
 func CreateAndPushTag() error {
-	// 显示开始信息
-	fmt.Printf("%s %s\n",
-		theme.InfoStyle.Render("🏷️"),
-		theme.TitleStyle.Render("Creating and Pushing Git Tag"))
-
 	latestVersion, err := GetLatestTag()
 	if err != nil {
 		return fmt.Errorf("get latest tag error: %w", err)

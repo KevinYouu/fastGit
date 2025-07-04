@@ -295,83 +295,47 @@ func GetCustomTheme() *huh.Theme {
 	return theme
 }
 
-// GetCompactTheme 返回适用于低高度终端的紧凑主题
-func GetCompactTheme(isCompact bool) *huh.Theme {
+// GetCompactTheme 返回紧凑主题（为了兼容性，忽略 isCompact 参数，总是返回紧凑主题）
+func GetCompactTheme() *huh.Theme {
 	theme := huh.ThemeBase()
 
-	if isCompact {
-		// 紧凑模式：最小化边距和装饰，完全移除顶部空白
-		theme.Focused.Base = lipgloss.NewStyle().
-			BorderStyle(lipgloss.NormalBorder()).
-			BorderForeground(PrimaryColor).
-			Padding(0, 1, 1, 1). // 上, 右, 下, 左 - 顶部0边距，底部有1行内边距
-			Margin(0, 0, 1, 0).  // 上, 右, 下, 左 - 顶部0边距，底部有1行外边距
-			MarginTop(0)         // 明确设置顶部边距为0
+	// 紧凑模式：最小化边距和内边距
+	theme.Focused.Base = lipgloss.NewStyle().
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(PrimaryColor).
+		Padding(0, 1, 1, 1). // 上, 右, 下, 左 - 顶部0边距，底部有1行内边距
+		Margin(0, 0, 1, 0).  // 上, 右, 下, 左 - 顶部0边距，底部有1行外边距
+		MarginTop(0)         // 明确设置顶部边距为0
 
-		theme.Blurred.Base = lipgloss.NewStyle().
-			BorderStyle(lipgloss.NormalBorder()).
-			BorderForeground(BorderColor).
-			Padding(0, 1, 1, 1). // 上, 右, 下, 左 - 顶部0边距，底部有1行内边距
-			Margin(0, 0, 1, 0).  // 上, 右, 下, 左 - 顶部0边距，底部有1行外边距
-			MarginTop(0)         // 明确设置顶部边距为0
+	theme.Blurred.Base = lipgloss.NewStyle().
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(BorderColor).
+		Padding(0, 1, 1, 1). // 上, 右, 下, 左 - 顶部0边距，底部有1行内边距
+		Margin(0, 0, 1, 0).  // 上, 右, 下, 左 - 顶部0边距，底部有1行外边距
+		MarginTop(0)         // 明确设置顶部边距为0
 
-		// 紧凑标题样式 - 完全无边距
-		theme.Focused.Title = lipgloss.NewStyle().
-			Foreground(PrimaryColor).
-			Bold(true).
-			Margin(0).    // 无边距
-			MarginTop(0). // 明确设置顶部边距为0
-			PaddingTop(0) // 明确设置顶部内边距为0
+	// 紧凑标题样式 - 完全无边距
+	theme.Focused.Title = lipgloss.NewStyle().
+		Foreground(PrimaryColor).
+		Bold(true).
+		Margin(0).    // 无边距
+		MarginTop(0). // 明确设置顶部边距为0
+		PaddingTop(0) // 明确设置顶部内边距为0
 
-		theme.Blurred.Title = lipgloss.NewStyle().
-			Foreground(TextMuted).
-			Margin(0).    // 无边距
-			MarginTop(0). // 明确设置顶部边距为0
-			PaddingTop(0) // 明确设置顶部内边距为0
+	theme.Blurred.Title = lipgloss.NewStyle().
+		Foreground(TextMuted).
+		Margin(0).    // 无边距
+		MarginTop(0). // 明确设置顶部边距为0
+		PaddingTop(0) // 明确设置顶部内边距为0
 
-		// 紧凑描述样式
-		theme.Focused.Description = lipgloss.NewStyle().
-			Foreground(TextSecondary)
+	// 紧凑描述样式
+	theme.Focused.Description = lipgloss.NewStyle().
+		Foreground(TextSecondary)
 
-		theme.Blurred.Description = lipgloss.NewStyle().
-			Foreground(TextMuted)
-	} else {
-		// 正常模式：使用标准主题
-		theme.Focused.Base = lipgloss.NewStyle().
-			BorderStyle(lipgloss.RoundedBorder()).
-			BorderForeground(PrimaryColor).
-			Background(BackgroundLighter).
-			Padding(1, 2)
+	theme.Blurred.Description = lipgloss.NewStyle().
+		Foreground(TextMuted)
 
-		theme.Blurred.Base = lipgloss.NewStyle().
-			BorderStyle(lipgloss.RoundedBorder()).
-			BorderForeground(BorderColor).
-			Background(BackgroundColor).
-			Padding(1, 2)
-
-		// 标准标题样式
-		theme.Focused.Title = lipgloss.NewStyle().
-			Foreground(PrimaryColor).
-			Bold(true).
-			Padding(0, 0, 1, 0)
-
-		theme.Blurred.Title = lipgloss.NewStyle().
-			Foreground(TextMuted).
-			Padding(0, 0, 1, 0)
-
-		// 标准描述样式
-		theme.Focused.Description = lipgloss.NewStyle().
-			Foreground(TextSecondary).
-			Italic(true).
-			Padding(0, 0, 1, 0)
-
-		theme.Blurred.Description = lipgloss.NewStyle().
-			Foreground(TextMuted).
-			Italic(true).
-			Padding(0, 0, 1, 0)
-	}
-
-	// 选择器样式保持一致
+	// 选择器样式
 	theme.Focused.SelectedOption = lipgloss.NewStyle().
 		Foreground(TextColor).
 		Background(PrimaryColor).

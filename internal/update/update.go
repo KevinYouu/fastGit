@@ -2,16 +2,15 @@ package update
 
 import (
 	"archive/zip"
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
-	"strings"
+
+	"github.com/KevinYouu/fastGit/internal/command"
 )
 
 const (
@@ -51,7 +50,7 @@ func getPlatformName() (string, error) {
 		switch runtime.GOARCH {
 		case "amd64":
 			return "linux_amd64", nil
-		case "arm64":
+		case "arm64", "aarch64":
 			return "linux_arm64", nil
 		}
 	case "darwin":
@@ -65,24 +64,49 @@ func getPlatformName() (string, error) {
 	return "", fmt.Errorf("unsupported platform: %s/%s", runtime.GOOS, runtime.GOARCH)
 }
 
+func getInstallDir() string {
+	switch runtime.GOOS {
+	case "darwin":
+		if runtime.GOARCH == "arm64" {
+			return "/opt/homebrew/bin"
+		}
+		return "/usr/local/bin"
+	case "linux":
+		return "/usr/local/bin"
+	case "windows":
+		// Windows 通过 PowerShell 脚本处理
+		return ""
+	}
+	return "/usr/local/bin"
+}
+
 func UpdateSelf() error {
+	// Windows 使用 PowerShell 脚本
 	if runtime.GOOS == "windows" {
-		cmd := exec.Command("powershell", "-Command", "iwr -useb https://raw.githubusercontent.com/KevinYouu/fastGit/main/install.ps1 | iex")
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		err := cmd.Run()
+		fmt.Println("🔄 Running Windows update script...")
+		_, err := command.RunCmdWithSpinner("powershell",
+			[]string{"-Command", "iwr -useb https://raw.githubusercontent.com/KevinYouu/fastGit/main/install.ps1 | iex"},
+			"Downloading and running update script...",
+			"Update script executed successfully")
 		if err != nil {
 			return fmt.Errorf("failed to run install script: %w", err)
 		}
-		fmt.Println("Update script executed. Please restart fastGit manually.")
+		fmt.Println("✅ Update complete. Please restart fastGit manually.")
 		return nil
 	}
+
+	// Unix 系统（Linux, macOS）使用改进的更新流程
+	return updateUnix()
+}
+
+func updateUnix() error {
+	fmt.Println("🔍 Checking for latest version...")
 
 	version, err := getLatestVersion()
 	if err != nil {
 		return fmt.Errorf("failed to get latest version: %w", err)
 	}
-	fmt.Println("Latest version:", version)
+	fmt.Printf("📦 Latest version: %s\n", version)
 
 	platform, err := getPlatformName()
 	if err != nil {
@@ -92,52 +116,177 @@ func UpdateSelf() error {
 	assetName := fmt.Sprintf("fastGit_%s_%s.zip", version, platform)
 	url := fmt.Sprintf("https://github.com/%s/%s/releases/download/%s/%s", repoOwner, repoName, version, assetName)
 
-	fmt.Println("Downloading:", url)
-	resp, err := http.Get(url)
+	// 创建临时目录
+	tempDir, err := os.MkdirTemp("", "fastgit-update-*")
 	if err != nil {
-		return fmt.Errorf("failed to download asset: %w", err)
+		return fmt.Errorf("failed to create temp directory: %w", err)
 	}
-	defer resp.Body.Close()
+	defer os.RemoveAll(tempDir)
 
-	buf := new(bytes.Buffer)
-	_, err = io.Copy(buf, resp.Body)
+	zipPath := filepath.Join(tempDir, assetName)
+
+	// 使用命令执行器下载文件
+	commands := []command.CommandInfo{
+		{
+			Command:     "curl",
+			Args:        []string{"-L", "-o", zipPath, url},
+			Description: "Downloading latest release",
+			LoadingMsg:  fmt.Sprintf("Downloading %s...", assetName),
+			SuccessMsg:  "Download completed successfully",
+		},
+	}
+
+	err = command.RunMultipleCommands(commands)
 	if err != nil {
-		return fmt.Errorf("failed to read asset: %w", err)
+		// 如果 curl 失败，尝试使用 wget
+		fmt.Println("⚠️  curl failed, trying wget...")
+		commands[0].Command = "wget"
+		commands[0].Args = []string{"-O", zipPath, url}
+		commands[0].LoadingMsg = fmt.Sprintf("Downloading %s with wget...", assetName)
+
+		err = command.RunMultipleCommands(commands)
+		if err != nil {
+			return fmt.Errorf("failed to download with both curl and wget: %w", err)
+		}
 	}
 
-	zipReader, err := zip.NewReader(bytes.NewReader(buf.Bytes()), int64(buf.Len()))
+	// 解压文件
+	fmt.Println("📂 Extracting downloaded file...")
+	if err := extractZip(zipPath, tempDir); err != nil {
+		return fmt.Errorf("failed to extract zip: %w", err)
+	}
+
+	// 安装文件
+	installDir := getInstallDir()
+	extractedBinary := filepath.Join(tempDir, "fastGit")
+	targetPath := filepath.Join(installDir, "fastGit")
+
+	fmt.Printf("📥 Installing to %s...\n", installDir)
+
+	// 检查目标文件是否存在，如果存在先尝试删除以测试权限
+	if _, err := os.Stat(targetPath); err == nil {
+		// 文件存在，尝试移除以测试权限
+		if err := os.Remove(targetPath); err != nil {
+			fmt.Println("⚠️  Root permissions required for installation")
+			fmt.Println("💡 You may be prompted for your password...")
+			err = runSudoInstall(extractedBinary, targetPath)
+		} else {
+			// 能够删除，说明有权限，直接安装
+			fmt.Println("✓ Direct installation (sufficient permissions)")
+			err = runDirectInstall(extractedBinary, targetPath)
+		}
+	} else {
+		// 文件不存在，尝试创建测试文件来检查权限
+		if hasWritePermission(installDir) {
+			fmt.Println("✓ Direct installation (no sudo required)")
+			err = runDirectInstall(extractedBinary, targetPath)
+		} else {
+			fmt.Println("⚠️  Root permissions required for installation")
+			fmt.Println("💡 You may be prompted for your password...")
+			err = runSudoInstall(extractedBinary, targetPath)
+		}
+	}
+
 	if err != nil {
-		return fmt.Errorf("failed to open zip: %w", err)
+		return fmt.Errorf("failed to install binary: %w", err)
 	}
 
-	execPath, err := os.Executable()
+	fmt.Println("🎉 Update completed successfully!")
+	fmt.Println("💡 Please restart your terminal or run 'source ~/.bashrc' (or equivalent) to use the updated version.")
+
+	return nil
+}
+
+func extractZip(src, dest string) error {
+	reader, err := zip.OpenReader(src)
 	if err != nil {
-		return fmt.Errorf("failed to get executable path: %w", err)
+		return err
 	}
-	dir := filepath.Dir(execPath)
+	defer reader.Close()
 
-	for _, f := range zipReader.File {
-		if !strings.HasPrefix(f.Name, "fastGit") {
+	for _, file := range reader.File {
+		path := filepath.Join(dest, file.Name)
+
+		if file.FileInfo().IsDir() {
+			os.MkdirAll(path, file.FileInfo().Mode())
 			continue
 		}
-		outPath := filepath.Join(dir, f.Name)
-		outFile, err := os.OpenFile(outPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0755)
+
+		fileReader, err := file.Open()
 		if err != nil {
-			return fmt.Errorf("failed to open output file: %w", err)
+			return err
 		}
-		inFile, err := f.Open()
+		defer fileReader.Close()
+
+		targetFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.FileInfo().Mode())
 		if err != nil {
-			outFile.Close()
-			return fmt.Errorf("failed to open file in zip: %w", err)
+			return err
 		}
-		_, err = io.Copy(outFile, inFile)
-		inFile.Close()
-		outFile.Close()
+		defer targetFile.Close()
+
+		_, err = io.Copy(targetFile, fileReader)
 		if err != nil {
-			return fmt.Errorf("failed to copy file: %w", err)
+			return err
 		}
 	}
 
-	fmt.Println("Update complete. Please restart fastGit.")
+	return nil
+}
+
+// hasWritePermission 检查是否对目录有写权限
+func hasWritePermission(dir string) bool {
+	testFile := filepath.Join(dir, ".fastgit-write-test")
+	file, err := os.Create(testFile)
+	if err != nil {
+		return false
+	}
+	file.Close()
+	os.Remove(testFile)
+	return true
+}
+
+// runDirectInstall 直接安装（无需 sudo）
+func runDirectInstall(source, target string) error {
+	installCommands := []command.CommandInfo{
+		{
+			Command:     "cp",
+			Args:        []string{source, target},
+			Description: "Installing binary to system directory",
+			LoadingMsg:  "Installing fastGit binary...",
+			SuccessMsg:  "Binary installed successfully",
+		},
+		{
+			Command:     "chmod",
+			Args:        []string{"+x", target},
+			Description: "Setting executable permissions",
+			LoadingMsg:  "Setting permissions...",
+			SuccessMsg:  "Permissions set successfully",
+		},
+	}
+	return command.RunMultipleCommands(installCommands)
+}
+
+// runSudoInstall 使用交互式 sudo 安装
+func runSudoInstall(source, target string) error {
+	fmt.Println("🔐 Installing with sudo...")
+
+	// 复制文件
+	_, err := command.RunCmdWithSpinner("sudo",
+		[]string{"cp", source, target},
+		"Installing binary with sudo...",
+		"Binary installed successfully")
+	if err != nil {
+		return fmt.Errorf("failed to copy binary: %w", err)
+	}
+
+	// 设置权限
+	_, err = command.RunCmdWithSpinner("sudo",
+		[]string{"chmod", "+x", target},
+		"Setting executable permissions...",
+		"Permissions set successfully")
+	if err != nil {
+		return fmt.Errorf("failed to set permissions: %w", err)
+	}
+
 	return nil
 }

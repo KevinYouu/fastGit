@@ -111,6 +111,11 @@ func (m *ProgressModel) tickCmd() tea.Cmd {
 func (m *ProgressModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
+		// 如果已经完成（成功或失败），任何按键都退出
+		if m.isCompleted {
+			return m, tea.Quit
+		}
+		// 如果正在执行中，只允许 q 或 Ctrl+C 退出
 		if msg.String() == "q" || msg.String() == "ctrl+c" {
 			return m, tea.Quit
 		}
@@ -155,9 +160,24 @@ func (m *ProgressModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, func() tea.Msg { return AllCompleteMsg{Success: true} }
 			}
 		} else {
-			// 命令失败
+			// 命令失败 - 收集详细的错误信息
 			m.hasError = true
-			m.errorMessage = msg.Error.Error()
+
+			// 构建详细的错误消息
+			errorMsg := fmt.Sprintf("Step %d failed: %s", msg.Step+1, msg.Error.Error())
+
+			// 如果有命令输出，添加到错误信息中
+			if strings.TrimSpace(msg.Output) != "" {
+				errorMsg += fmt.Sprintf("\nOutput: %s", strings.TrimSpace(msg.Output))
+			}
+
+			// 添加命令信息
+			if msg.Step < len(m.commands) {
+				cmd := m.commands[msg.Step]
+				errorMsg += fmt.Sprintf("\nCommand: %s %s", cmd.Command, strings.Join(cmd.Args, " "))
+			}
+
+			m.errorMessage = errorMsg
 			m.status = fmt.Sprintf("Failed: %s", m.commands[msg.Step].Description)
 			if len(m.stepStatus) > msg.Step {
 				m.stepStatus[msg.Step] = 3 // 标记为失败
@@ -171,8 +191,8 @@ func (m *ProgressModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if msg.Success {
 			m.status = "All commands completed successfully!"
 		}
-		// 等待一秒让用户看到结果，然后退出
-		return m, tea.Tick(time.Second, func(time.Time) tea.Msg {
+		// 减少等待时间，让用户更快看到摘要
+		return m, tea.Tick(500*time.Millisecond, func(time.Time) tea.Msg {
 			return tea.Quit()
 		})
 	}
@@ -286,21 +306,17 @@ func (m *ProgressModel) View() string {
 			style.Render(fmt.Sprintf("Step %d: %s", i+1, cmd.Description))))
 	}
 
-	// 错误信息
-	if m.hasError && m.errorMessage != "" {
-		s.WriteString("\n")
-		s.WriteString(fmt.Sprintf("%s %s\n",
-			theme.ErrorStyle.Render("Error details:"),
-			theme.ErrorStyle.Render(m.errorMessage)))
-	}
-
 	// 完成时的提示
 	if m.isCompleted {
 		s.WriteString("\n")
+		hintStyle := lipgloss.NewStyle().
+			Foreground(theme.TextSecondary).
+			Italic(true)
+
 		if m.hasError {
-			s.WriteString(theme.ErrorStyle.Render("Process failed. Press any key to exit."))
+			s.WriteString(hintStyle.Render("💡 Exiting to show error details..."))
 		} else {
-			s.WriteString(theme.SuccessStyle.Render("🎉 All commands completed successfully!"))
+			s.WriteString(hintStyle.Render("💡 Exiting..."))
 		}
 	}
 
@@ -330,8 +346,29 @@ func (m *ProgressModel) executeCommand(step int) tea.Cmd {
 	cmd := m.commands[step]
 
 	return func() tea.Msg {
-		// 执行命令
-		output, err := exec.Command(cmd.Command, cmd.Args...).CombinedOutput()
+		// 创建带上下文的命令执行
+		execCmd := exec.Command(cmd.Command, cmd.Args...)
+
+		// 设置工作目录（如果需要）
+		// execCmd.Dir = workingDir
+
+		// 执行命令并捕获输出
+		output, err := execCmd.CombinedOutput()
+
+		// 如果命令不存在，提供更有用的错误信息
+		if err != nil {
+			if execCmd.ProcessState == nil {
+				// 命令启动失败（通常是命令不存在）
+				enhancedErr := fmt.Errorf("failed to start command '%s': %w (make sure the command is installed and in PATH)", cmd.Command, err)
+				return StepCompleteMsg{
+					Step:    step,
+					Success: false,
+					Output:  string(output),
+					Error:   enhancedErr,
+				}
+			}
+		}
+
 		return StepCompleteMsg{
 			Step:    step,
 			Success: err == nil,
@@ -351,14 +388,53 @@ func RunMultipleCommandsWithBubbleTea(commands []CommandInfo) error {
 		return fmt.Errorf("failed to run progress UI: %w", err)
 	}
 
-	// 检查最终状态
+	// 检查最终状态并在程序退出后显示摘要
 	if progressModel, ok := finalModel.(*ProgressModel); ok {
 		if progressModel.hasError {
-			return fmt.Errorf("%s", progressModel.errorMessage)
+			// 在程序退出后显示错误摘要，这样不会被清除
+			printExecutionSummary(progressModel)
+			return fmt.Errorf("command execution failed")
+		} else {
+			// 成功时也显示摘要
+			printExecutionSummary(progressModel)
 		}
 	}
 
 	return nil
+}
+
+// printExecutionSummary 在程序退出后打印执行摘要
+func printExecutionSummary(model *ProgressModel) {
+	if model.hasError {
+		// 显示失败的步骤信息
+		if model.currentStep < len(model.commands) {
+			failedCmd := model.commands[model.currentStep]
+			fmt.Printf("Failed at step %d: %s\n", model.currentStep+1, failedCmd.Description)
+			fmt.Printf("Command: %s %s\n", failedCmd.Command, strings.Join(failedCmd.Args, " "))
+		}
+
+		// 显示详细的错误信息
+		if model.errorMessage != "" {
+			fmt.Println()
+			errorLines := strings.Split(model.errorMessage, "\n")
+			for _, line := range errorLines {
+				if strings.TrimSpace(line) != "" && !strings.HasPrefix(line, "Step ") && !strings.HasPrefix(line, "Command:") {
+					errorStyle := lipgloss.NewStyle().
+						Foreground(theme.ErrorColor).
+						Render(strings.TrimSpace(line))
+					fmt.Println(errorStyle)
+				}
+			}
+		}
+	} else {
+		// 成功时显示简单的成功信息
+		fmt.Println(lipgloss.NewStyle().
+			Foreground(theme.SuccessColor).
+			Bold(true).
+			Render("🎉 All operations completed successfully!"))
+	}
+
+	fmt.Println() // 结尾空行
 }
 
 // RunMultipleCommandsWithProgress 使用 Bubble Tea 执行多个命令（别名，保持向后兼容）

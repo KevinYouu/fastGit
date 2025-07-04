@@ -412,6 +412,42 @@ func GetCompactTheme(isCompact bool) *huh.Theme {
 		Foreground(ErrorColor).
 		Italic(true)
 
+	// 隐藏帮助信息
+	theme.Help.Ellipsis = lipgloss.NewStyle().
+		Foreground(lipgloss.Color("0")). // 设置为透明或与背景同色
+		Width(0).
+		Height(0)
+
+	theme.Help.ShortKey = lipgloss.NewStyle().
+		Foreground(lipgloss.Color("0")). // 设置为透明
+		Width(0).
+		Height(0)
+
+	theme.Help.ShortDesc = lipgloss.NewStyle().
+		Foreground(lipgloss.Color("0")). // 设置为透明
+		Width(0).
+		Height(0)
+
+	theme.Help.ShortSeparator = lipgloss.NewStyle().
+		Foreground(lipgloss.Color("0")). // 设置为透明
+		Width(0).
+		Height(0)
+
+	theme.Help.FullKey = lipgloss.NewStyle().
+		Foreground(lipgloss.Color("0")). // 设置为透明
+		Width(0).
+		Height(0)
+
+	theme.Help.FullDesc = lipgloss.NewStyle().
+		Foreground(lipgloss.Color("0")). // 设置为透明
+		Width(0).
+		Height(0)
+
+	theme.Help.FullSeparator = lipgloss.NewStyle().
+		Foreground(lipgloss.Color("0")). // 设置为透明
+		Width(0).
+		Height(0)
+
 	return theme
 }
 

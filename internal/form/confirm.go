@@ -8,15 +8,15 @@ import (
 func Confirm(title string) bool {
 	var confirmed bool
 
-	// 直接使用紧凑模式
+	// 直接使用紧凑模式，并尝试禁用帮助
 	form := huh.NewForm(
 		huh.NewGroup(
 			huh.NewConfirm().
 				Title(title).
-				Description("←/→ 或 y/n，Enter 确认").
 				Value(&confirmed),
 		),
-	).WithTheme(theme.GetCompactTheme(true))
+	).WithTheme(theme.GetCompactTheme(true)).
+		WithShowHelp(false) // 尝试禁用帮助
 
 	err := form.Run()
 	if err != nil {

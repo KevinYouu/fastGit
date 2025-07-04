@@ -149,9 +149,8 @@ func Reset() error {
 		shortMsg = shortMsg[:37] + "..."
 	}
 
-	confirmDesc := fmt.Sprintf("确认重置到 %s\n"+
-		"%s\n"+
-		"%s模式%s",
+	confirmDesc := fmt.Sprintf("确认重置到 %s  "+"%s "+
+		"%s模式 %s",
 		lipgloss.NewStyle().Foreground(theme.PrimaryColor).Bold(true).Render(selectedCommit.Hash),
 		shortMsg,
 		modeColor.Render(resetModeReadable),

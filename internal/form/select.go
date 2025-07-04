@@ -16,19 +16,15 @@ func min(a, b int) int {
 	return b
 }
 
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
 func SelectForm(title string, options []config.Option) (label, value string, err error) {
-	// 检测终端高度，决定使用哪种布局
-	_, height, err := term.GetSize(int(os.Stdout.Fd()))
-	if err != nil {
-		height = 24 // 默认值
-	}
-
-	// 如果终端高度非常低（< 12行），使用超紧凑布局
-	if height < 12 {
-		return UltraCompactSelectForm(title, options)
-	}
-
-	// 否则使用标准紧凑布局
+	// 使用统一的紧凑布局
 	var selectedValue string
 
 	selectOpts := make([]huh.Option[string], len(options))
@@ -36,14 +32,9 @@ func SelectForm(title string, options []config.Option) (label, value string, err
 		selectOpts[i] = huh.NewOption(opt.Label, opt.Value)
 	}
 
-	// 计算合适的高度
-	availableHeight := height - 6
-	compactHeight := max(min(len(options)+1, availableHeight), 3)
-
 	form := huh.NewForm(
 		huh.NewGroup(
 			huh.NewSelect[string]().
-				Height(compactHeight).
 				Title(title).
 				Options(selectOpts...).
 				Value(&selectedValue).
@@ -68,18 +59,13 @@ func SelectForm(title string, options []config.Option) (label, value string, err
 }
 
 func SelectFormWithStringSlice(title string, options []string) (label, value string, err error) {
-	// 检测终端高度，决定使用哪种布局
+	// 检测终端高度用于高度计算
 	_, height, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil {
 		height = 24 // 默认值
 	}
 
-	// 如果终端高度非常低（< 12行），使用超紧凑布局
-	if height < 12 {
-		return UltraCompactSelectFormWithStringSlice(title, options)
-	}
-
-	// 否则使用标准紧凑布局
+	// 使用统一的紧凑布局
 	var selectedValue string
 
 	selectOpts := make([]huh.Option[string], len(options))

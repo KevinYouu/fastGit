@@ -7,7 +7,6 @@ import (
 	"github.com/KevinYouu/fastGit/internal/config"
 	"github.com/KevinYouu/fastGit/internal/form"
 	"github.com/KevinYouu/fastGit/internal/logs"
-	"github.com/KevinYouu/fastGit/internal/theme"
 )
 
 func PushSelected() error {
@@ -38,10 +37,6 @@ func PushSelected() error {
 		logs.Error("No files selected.")
 		return nil
 	}
-
-	// 显示开始信息
-	fmt.Printf("%s",
-		theme.TitleStyle.Render("Starting Git Push Selected Process"))
 
 	options, err := config.GetOptions()
 	if err != nil {

@@ -301,18 +301,12 @@ func GetCompactTheme() *huh.Theme {
 
 	// 紧凑模式：最小化边距和内边距
 	theme.Focused.Base = lipgloss.NewStyle().
-		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(PrimaryColor).
-		Padding(0, 1, 1, 1). // 上, 右, 下, 左 - 顶部0边距，底部有1行内边距
-		Margin(0, 0, 1, 0).  // 上, 右, 下, 左 - 顶部0边距，底部有1行外边距
-		MarginTop(0)         // 明确设置顶部边距为0
+		MarginTop(0) // 明确设置顶部边距为0
 
 	theme.Blurred.Base = lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).
 		BorderForeground(BorderColor).
-		Padding(0, 1, 1, 1). // 上, 右, 下, 左 - 顶部0边距，底部有1行内边距
-		Margin(0, 0, 1, 0).  // 上, 右, 下, 左 - 顶部0边距，底部有1行外边距
-		MarginTop(0)         // 明确设置顶部边距为0
+		MarginTop(0) // 明确设置顶部边距为0
 
 	// 紧凑标题样式 - 完全无边距
 	theme.Focused.Title = lipgloss.NewStyle().
@@ -415,86 +409,6 @@ func GetCompactTheme() *huh.Theme {
 	return theme
 }
 
-// GetUltraCompactTheme 返回针对极低高度终端的超紧凑主题
-// 将描述信息移到右侧，最大化纵向空间利用
-func GetUltraCompactTheme() *huh.Theme {
-	theme := huh.ThemeBase()
-
-	// 超紧凑基础样式：无边框，完全移除顶部空白
-	theme.Focused.Base = lipgloss.NewStyle().
-		BorderStyle(lipgloss.HiddenBorder()).
-		Padding(0, 0, 1, 0). // 顶部0边距，底部有1行内边距
-		Margin(0, 0, 1, 0).  // 顶部0边距，底部有1行外边距
-		MarginTop(0)         // 明确设置顶部边距为0
-
-	theme.Blurred.Base = lipgloss.NewStyle().
-		BorderStyle(lipgloss.HiddenBorder()).
-		Padding(0, 0, 1, 0). // 顶部0边距，底部有1行内边距
-		Margin(0, 0, 1, 0).  // 顶部0边距，底部有1行外边距
-		MarginTop(0)         // 明确设置顶部边距为0
-
-	// 超紧凑标题：单行，无装饰，完全无边距
-	theme.Focused.Title = lipgloss.NewStyle().
-		Foreground(PrimaryColor).
-		Bold(true).
-		Padding(0).
-		Margin(0).
-		MarginTop(0). // 明确设置顶部边距为0
-		PaddingTop(0) // 明确设置顶部内边距为0
-
-	theme.Blurred.Title = lipgloss.NewStyle().
-		Foreground(TextMuted).
-		Padding(0).
-		Margin(0).
-		MarginTop(0). // 明确设置顶部边距为0
-		PaddingTop(0) // 明确设置顶部内边距为0
-
-	// 隐藏描述文本，因为要移到右侧显示
-	theme.Focused.Description = lipgloss.NewStyle().
-		Foreground(lipgloss.Color("")).
-		Height(0).
-		Padding(0).
-		Margin(0)
-
-	theme.Blurred.Description = lipgloss.NewStyle().
-		Foreground(lipgloss.Color("")).
-		Height(0).
-		Padding(0).
-		Margin(0)
-
-	// 选择器样式：紧凑但清晰
-	theme.Focused.SelectedOption = lipgloss.NewStyle().
-		Foreground(TextColor).
-		Background(PrimaryColor).
-		Bold(true).
-		Padding(0, 1)
-
-	theme.Focused.UnselectedOption = lipgloss.NewStyle().
-		Foreground(TextSecondary).
-		Padding(0, 1)
-
-	theme.Blurred.SelectedOption = lipgloss.NewStyle().
-		Foreground(TextMuted).
-		Padding(0, 1)
-
-	theme.Blurred.UnselectedOption = lipgloss.NewStyle().
-		Foreground(TextMuted).
-		Padding(0, 1)
-
-	// 确认按钮样式
-	theme.Focused.FocusedButton = lipgloss.NewStyle().
-		Foreground(TextColor).
-		Background(PrimaryColor).
-		Bold(true).
-		Padding(0, 2)
-
-	theme.Focused.BlurredButton = lipgloss.NewStyle().
-		Foreground(TextSecondary).
-		Padding(0, 2)
-
-	return theme
-}
-
 // GetProgressBarStyle 获取现代化进度条样式
 func GetProgressBarStyle() lipgloss.Style {
 	return lipgloss.NewStyle().
@@ -546,21 +460,6 @@ func GetHorizontalRule(width int) string {
 		Align(lipgloss.Center).
 		Render(strings.Repeat("─", width))
 	return rule
-}
-
-// GetHeader 获取带装饰的标题
-func GetHeader(title string) string {
-	headerStyle := lipgloss.NewStyle().
-		Foreground(PrimaryColor).
-		Background(BackgroundHighlight).
-		Bold(true).
-		Padding(1, 3).
-		BorderStyle(lipgloss.DoubleBorder()).
-		BorderForeground(PrimaryColor).
-		Width(60).
-		Align(lipgloss.Center)
-
-	return headerStyle.Render(title)
 }
 
 // GetStatusIcon 根据状态获取图标

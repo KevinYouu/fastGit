@@ -32,7 +32,7 @@ func statusColor(status string) string {
 }
 
 func getFileStatuses() ([]FileStatus, error) {
-	output, err := command.RunCmdWithSpinner("git", []string{"status", "--porcelain"}, i18n.T("progress.loading"), i18n.T("success.step.complete"))
+	output, err := command.RunCmdWithSpinnerOptions("git", []string{"status", "--porcelain"}, i18n.T("progress.loading"), i18n.T("success.step.complete"), false)
 	if err != nil {
 		return nil, fmt.Errorf(i18n.T("error.command.execution")+" %w", err)
 	}

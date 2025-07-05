@@ -76,7 +76,6 @@ var enTranslations = map[string]string{
 
 	// Git commands and operations
 	"git.remotes.title":     "Remotes:",
-	"git.remotes.failed":    "Failed to get remotes:",
 	"git.status.no_changes": "No files changed.",
 	"git.status.title":      "File statuses:",
 

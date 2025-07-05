@@ -76,7 +76,6 @@ var zhTranslations = map[string]string{
 
 	// Git commands and operations
 	"git.remotes.title":     "远程仓库：",
-	"git.remotes.failed":    "获取远程仓库失败：",
 	"git.status.no_changes": "没有文件更改。",
 	"git.status.title":      "文件状态：",
 

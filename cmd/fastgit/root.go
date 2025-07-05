@@ -54,7 +54,6 @@ func init() {
 	rootCmd.AddCommand(
 		commands.PushAllCommand(),
 		commands.PushSelectedCommand(),
-		commands.RemotesCommand(),
 		commands.ResetCommand(),
 		commands.TagCommand(),
 		commands.TagDeleteCommand(),

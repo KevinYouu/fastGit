@@ -15,6 +15,11 @@ import (
 
 // RunCmdWithSpinner 带加载动画的命令执行
 func RunCmdWithSpinner(command string, args []string, loadingMsg, successMsg string) (string, error) {
+	return RunCmdWithSpinnerOptions(command, args, loadingMsg, successMsg, true)
+}
+
+// RunCmdWithSpinnerOptions 带加载动画的命令执行（带选项）
+func RunCmdWithSpinnerOptions(command string, args []string, loadingMsg, successMsg string, showOutput bool) (string, error) {
 	// 创建加载动画的channel
 	done := make(chan bool)
 	result := make(chan string, 1) // 添加缓冲避免阻塞
@@ -88,9 +93,9 @@ func RunCmdWithSpinner(command string, args []string, loadingMsg, successMsg str
 		theme.SuccessStyle.Render("✓"),
 		theme.SuccessStyle.Render(successMsg))
 
-	// 如果有输出内容，显示它
+	// 如果有输出内容且需要显示，显示它
 	trimmedOutput := strings.TrimSpace(output)
-	if trimmedOutput != "" {
+	if showOutput && trimmedOutput != "" {
 		fmt.Println(lipgloss.NewStyle().Foreground(theme.TextSecondary).Render(trimmedOutput))
 	}
 

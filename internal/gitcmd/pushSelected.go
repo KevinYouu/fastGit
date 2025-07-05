@@ -6,17 +6,18 @@ import (
 	"github.com/KevinYouu/fastGit/internal/command"
 	"github.com/KevinYouu/fastGit/internal/config"
 	"github.com/KevinYouu/fastGit/internal/form"
+	"github.com/KevinYouu/fastGit/internal/i18n"
 	"github.com/KevinYouu/fastGit/internal/logs"
 )
 
 func PushSelected() error {
 	fileStatus, err := getFileStatuses()
 	if err != nil {
-		logs.Error("Failed to get file statuses")
+		logs.Error(i18n.T("error.get.file.status"))
 		return fmt.Errorf("getFileStatuses: %w", err)
 	}
 	if len(fileStatus) == 0 {
-		logs.Info("No files to push.")
+		logs.Info(i18n.T("push.selected.no.files"))
 		return nil
 	}
 
@@ -27,29 +28,29 @@ func PushSelected() error {
 		}
 	}
 
-	data, err := form.MultiSelectForm("Select files to push", selectedFiles)
+	data, err := form.MultiSelectForm(i18n.T("push.select.files"), selectedFiles)
 	if err != nil {
-		logs.Error("Failed to get file statuses:")
+		logs.Error(i18n.T("error.multiselect.form"))
 		return fmt.Errorf("MultiSelectForm: %w", err)
 	}
 
 	if len(data) == 0 {
-		logs.Error("No files selected.")
+		logs.Error(i18n.T("push.selected.no.selection"))
 		return nil
 	}
 
 	options, err := config.GetOptions()
 	if err != nil {
-		logs.Error("Failed to get options:")
+		logs.Error(i18n.T("error.get.options"))
 		return fmt.Errorf("GetOptions: %w", err)
 	}
 
-	_, suffix, err := form.SelectForm("Choose a commit type", options)
+	_, suffix, err := form.SelectForm(i18n.T("push.select.commit.type"), options)
 	if err != nil {
 		return fmt.Errorf("SelectForm: %w", err)
 	}
 
-	commitMessage, err := form.Input("Enter your commit message: ", suffix+": ")
+	commitMessage, err := form.Input(i18n.T("push.input.commit.message"), suffix+": ")
 	if err != nil {
 		return fmt.Errorf("Input: %w", err)
 	}
@@ -59,30 +60,30 @@ func PushSelected() error {
 		{
 			Command:     "git",
 			Args:        append([]string{"add"}, data...),
-			Description: "Adding selected files to staging area",
-			LoadingMsg:  "Adding selected files...",
-			SuccessMsg:  "Selected files added successfully",
+			Description: i18n.T("git.add.selected.description"),
+			LoadingMsg:  i18n.T("git.add.selected.loading"),
+			SuccessMsg:  i18n.T("git.add.selected.success"),
 		},
 		{
 			Command:     "git",
 			Args:        []string{"commit", "-m", commitMessage},
-			Description: "Creating commit with message",
-			LoadingMsg:  "Creating commit...",
-			SuccessMsg:  "Commit created successfully",
+			Description: i18n.T("git.commit.description"),
+			LoadingMsg:  i18n.T("git.commit.loading"),
+			SuccessMsg:  i18n.T("git.commit.success"),
 		},
 		{
 			Command:     "git",
 			Args:        []string{"pull"},
-			Description: "Pulling latest changes from remote",
-			LoadingMsg:  "Pulling changes...",
-			SuccessMsg:  "Pull completed successfully",
+			Description: i18n.T("git.pull.description"),
+			LoadingMsg:  i18n.T("git.pull.loading"),
+			SuccessMsg:  i18n.T("git.pull.success"),
 		},
 		{
 			Command:     "git",
 			Args:        []string{"push"},
-			Description: "Pushing changes to remote repository",
-			LoadingMsg:  "Pushing to remote...",
-			SuccessMsg:  "Push completed successfully",
+			Description: i18n.T("git.push.description"),
+			LoadingMsg:  i18n.T("git.push.loading"),
+			SuccessMsg:  i18n.T("git.push.success"),
 		},
 	}
 

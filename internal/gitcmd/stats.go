@@ -6,6 +6,7 @@ import (
 
 	"github.com/KevinYouu/fastGit/internal/colors"
 	"github.com/KevinYouu/fastGit/internal/command"
+	"github.com/KevinYouu/fastGit/internal/i18n"
 )
 
 type FileStatus struct {
@@ -31,9 +32,9 @@ func statusColor(status string) string {
 }
 
 func getFileStatuses() ([]FileStatus, error) {
-	output, err := command.RunCmdWithSpinner("git", []string{"status", "--porcelain"}, "Checking file status", "File status checked")
+	output, err := command.RunCmdWithSpinner("git", []string{"status", "--porcelain"}, i18n.T("progress.loading"), i18n.T("success.step.complete"))
 	if err != nil {
-		return nil, fmt.Errorf("error executing git status command: %w", err)
+		return nil, fmt.Errorf(i18n.T("error.command.execution")+" %w", err)
 	}
 
 	lines := strings.Split(string(output), "\n")
@@ -54,15 +55,15 @@ func getFileStatuses() ([]FileStatus, error) {
 func Status() error {
 	fileStatuss, err := getFileStatuses()
 	if err != nil {
-		return fmt.Errorf("Failed to get file statuses: %w", err)
+		return fmt.Errorf(i18n.T("error.file.status")+" %w", err)
 	}
 
 	if len(fileStatuss) == 0 {
-		fmt.Println(colors.RenderColor("blue", "No files changed."))
+		fmt.Println(colors.RenderColor("blue", i18n.T("git.status.no_changes")))
 		return nil
 	}
 
-	fmt.Println("File statuses:")
+	fmt.Println(i18n.T("git.status.title"))
 	for _, file := range fileStatuss {
 		color := statusColor(file.Status)
 		fmt.Println(colors.RenderColor(color, file.Status+" "+file.Path))

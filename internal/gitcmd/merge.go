@@ -7,6 +7,7 @@ import (
 
 	"github.com/KevinYouu/fastGit/internal/command"
 	"github.com/KevinYouu/fastGit/internal/form"
+	"github.com/KevinYouu/fastGit/internal/i18n"
 	"github.com/KevinYouu/fastGit/internal/logs"
 )
 
@@ -17,7 +18,7 @@ func MergeIntoCurrent() error {
 	}
 
 	if len(branches) == 0 {
-		logs.Info("No branches to merge.")
+		logs.Info(i18n.T("merge.no.branches"))
 		return nil
 	}
 
@@ -26,9 +27,9 @@ func MergeIntoCurrent() error {
 		return fmt.Errorf("selectBranchToMerge: %w", err)
 	}
 
-	output, err := command.RunCmd("git", []string{"merge", selectedBranch}, "Merge branch successfully.")
+	output, err := command.RunCmd("git", []string{"merge", selectedBranch}, i18n.T("merge.success.message"))
 	if err != nil {
-		logs.Error("Failed to merge: " + output)
+		logs.Error(i18n.T("merge.failed") + output)
 		return fmt.Errorf("git merge: %s", output)
 	}
 	return nil
@@ -46,7 +47,7 @@ func getCurrentBranches() ([]string, error) {
 
 	currentBranch, err := exec.Command("git", "branch", "--show-current").CombinedOutput()
 	if err != nil {
-		logs.Error("Failed to get current branch: " + string(currentBranch))
+		logs.Error(i18n.T("error.current.branch") + string(currentBranch))
 		return nil, err
 	}
 
@@ -63,9 +64,9 @@ func getCurrentBranches() ([]string, error) {
 }
 
 func selectBranchToMerge(branches []string) (string, error) {
-	_, selectedBranch, err := form.SelectFormWithStringSlice("Branch name to merge into the current branch", branches)
+	_, selectedBranch, err := form.SelectFormWithStringSlice(i18n.T("merge.select.target"), branches)
 	if err != nil {
-		return "", fmt.Errorf("error selecting branch: %w", err)
+		return "", fmt.Errorf(i18n.T("error.select.form.detail")+" %w", err)
 	}
 	return selectedBranch, nil
 }

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/KevinYouu/fastGit/internal/config"
+	"github.com/KevinYouu/fastGit/internal/i18n"
 	"github.com/KevinYouu/fastGit/internal/theme"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
@@ -250,7 +251,7 @@ func TableSelectForm(options []config.Option) (label, value string, err error) {
 
 	if tableModel, ok := finalModel.(tableModel); ok {
 		if tableModel.quitting && !tableModel.selected {
-			return "", "", fmt.Errorf("user aborted")
+			return "", "", fmt.Errorf("%s", i18n.T("table.user.aborted"))
 		}
 
 		if tableModel.selected {
@@ -262,7 +263,7 @@ func TableSelectForm(options []config.Option) (label, value string, err error) {
 		}
 	}
 
-	return "", "", fmt.Errorf("no selection made")
+	return "", "", fmt.Errorf("%s", i18n.T("table.no.selection"))
 }
 
 // TableSelectFormWithStringSlice 创建一个基于字符串切片的表格选择表单

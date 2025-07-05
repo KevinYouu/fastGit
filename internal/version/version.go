@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/KevinYouu/fastGit/internal/colors"
+	"github.com/KevinYouu/fastGit/internal/i18n"
 	"github.com/KevinYouu/fastGit/internal/random"
 )
 
@@ -17,9 +18,9 @@ func GetVersion() {
 	}
 	random.ExecuteRandomly(funcProbs)
 
-	fmt.Println("Version:", colors.RenderColor("blue", Version))
-	fmt.Println("Github:", colors.RenderColor("blue", "https://github.com/KevinYouu/fastGit"))
-	fmt.Println("To know more about me, you can visit:", colors.RenderColor("blue", "https://www.kevnu.com/about"))
+	fmt.Println(i18n.T("version.version"), colors.RenderColor("blue", Version))
+	fmt.Println(i18n.T("version.github"), colors.RenderColor("blue", "https://github.com/KevinYouu/fastGit"))
+	fmt.Println(i18n.T("version.about"), colors.RenderColor("blue", "https://www.kevnu.com/about"))
 }
 
 func GetLogo() {

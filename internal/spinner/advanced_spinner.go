@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/KevinYouu/fastGit/internal/i18n"
 	"github.com/KevinYouu/fastGit/internal/theme"
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
@@ -182,7 +183,7 @@ func (m AdvancedSpinnerModel) renderHeader() string {
 		Width(60).
 		Align(lipgloss.Center)
 
-	return headerStyle.Render("🚀 FastGit 操作进行中...")
+	return headerStyle.Render(i18n.T("spinner.fastgit.operation"))
 }
 
 // renderMainMessage 渲染主消息
@@ -233,18 +234,18 @@ func (m AdvancedSpinnerModel) renderProgress() string {
 // renderSteps 渲染步骤列表
 func (m AdvancedSpinnerModel) renderSteps() string {
 	var steps strings.Builder
-	steps.WriteString("  步骤进度:\n")
+	steps.WriteString(fmt.Sprintf("  %s\n", i18n.T("spinner.step.progress")))
 
 	for i, step := range m.steps {
 		var icon, style string
 		if i < m.currentStep {
-			icon = theme.GetStatusIcon("success")
+			icon = theme.GetStatusIcon(i18n.T("spinner.success"))
 			style = theme.SuccessStyle.Render(step)
 		} else if i == m.currentStep {
-			icon = theme.GetStatusIcon("loading")
+			icon = theme.GetStatusIcon(i18n.T("spinner.loading"))
 			style = theme.InfoStyle.Render(step)
 		} else {
-			icon = theme.GetStatusIcon("pending")
+			icon = theme.GetStatusIcon(i18n.T("spinner.pending"))
 			style = theme.UnselectedStyle.Render(step)
 		}
 
@@ -282,7 +283,7 @@ func (m AdvancedSpinnerModel) renderComplete() string {
 			Width(60).
 			Align(lipgloss.Center)
 		icon = "✨"
-		title = "操作成功完成！"
+		title = i18n.T("spinner.operation.complete")
 	} else {
 		headerStyle = lipgloss.NewStyle().
 			Foreground(theme.TextColor).
@@ -292,7 +293,7 @@ func (m AdvancedSpinnerModel) renderComplete() string {
 			Width(60).
 			Align(lipgloss.Center)
 		icon = "❌"
-		title = "操作失败"
+		title = i18n.T("spinner.operation.failed")
 	}
 
 	content.WriteString(headerStyle.Render(fmt.Sprintf("%s %s", icon, title)))
@@ -314,7 +315,7 @@ func (m AdvancedSpinnerModel) renderComplete() string {
 			Foreground(theme.ErrorColor).
 			Italic(true).
 			Padding(0, 2)
-		content.WriteString(errorStyle.Render(fmt.Sprintf("错误详情: %v", m.err)))
+		content.WriteString(errorStyle.Render(fmt.Sprintf(i18n.T("spinner.error.details"), m.err)))
 	}
 
 	// 显示耗时
@@ -323,7 +324,7 @@ func (m AdvancedSpinnerModel) renderComplete() string {
 		Foreground(theme.TextMuted).
 		Italic(true).
 		Padding(0, 2)
-	content.WriteString(timeStyle.Render(fmt.Sprintf("⏱️ 耗时: %v", m.elapsedTime.Round(time.Millisecond))))
+	content.WriteString(timeStyle.Render(fmt.Sprintf(i18n.T("spinner.elapsed.time"), m.elapsedTime.Round(time.Millisecond))))
 
 	return content.String()
 }

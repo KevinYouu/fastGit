@@ -11,6 +11,7 @@ import (
 	"runtime"
 
 	"github.com/KevinYouu/fastGit/internal/command"
+	"github.com/KevinYouu/fastGit/internal/i18n"
 )
 
 const (
@@ -61,7 +62,7 @@ func getPlatformName() (string, error) {
 			return "darwin_arm64", nil
 		}
 	}
-	return "", fmt.Errorf("unsupported platform: %s/%s", runtime.GOOS, runtime.GOARCH)
+	return "", fmt.Errorf(i18n.T("update.unsupported_platform")+": %s/%s", runtime.GOOS, runtime.GOARCH)
 }
 
 func getInstallDir() string {
@@ -83,15 +84,15 @@ func getInstallDir() string {
 func UpdateSelf() error {
 	// Windows 使用 PowerShell 脚本
 	if runtime.GOOS == "windows" {
-		fmt.Println("🔄 Running Windows update script...")
+		fmt.Println(i18n.T("update.running_windows_script"))
 		_, err := command.RunCmdWithSpinner("powershell",
 			[]string{"-Command", "iwr -useb https://raw.githubusercontent.com/KevinYouu/fastGit/main/install.ps1 | iex"},
-			"Downloading and running update script...",
-			"Update script executed successfully")
+			i18n.T("update.downloading_running_script"),
+			i18n.T("update.script_executed_success"))
 		if err != nil {
-			return fmt.Errorf("failed to run install script: %w", err)
+			return fmt.Errorf(i18n.T("update.failed_run_script")+": %w", err)
 		}
-		fmt.Println("✅ Update complete. Please restart fastGit manually.")
+		fmt.Println(i18n.T("update.complete_restart_manual"))
 		return nil
 	}
 
@@ -100,13 +101,13 @@ func UpdateSelf() error {
 }
 
 func updateUnix() error {
-	fmt.Println("🔍 Checking for latest version...")
+	fmt.Println(i18n.T("update.checking_latest_version"))
 
 	version, err := getLatestVersion()
 	if err != nil {
-		return fmt.Errorf("failed to get latest version: %w", err)
+		return fmt.Errorf(i18n.T("update.failed_get_latest_version")+": %w", err)
 	}
-	fmt.Printf("📦 Latest version: %s\n", version)
+	fmt.Printf(i18n.T("update.latest_version")+": %s\n", version)
 
 	platform, err := getPlatformName()
 	if err != nil {
@@ -119,7 +120,7 @@ func updateUnix() error {
 	// 创建临时目录
 	tempDir, err := os.MkdirTemp("", "fastgit-update-*")
 	if err != nil {
-		return fmt.Errorf("failed to create temp directory: %w", err)
+		return fmt.Errorf(i18n.T("update.failed_create_temp_dir")+": %w", err)
 	}
 	defer os.RemoveAll(tempDir)
 
@@ -130,30 +131,30 @@ func updateUnix() error {
 		{
 			Command:     "curl",
 			Args:        []string{"-L", "-o", zipPath, url},
-			Description: "Downloading latest release",
-			LoadingMsg:  fmt.Sprintf("Downloading %s...", assetName),
-			SuccessMsg:  "Download completed successfully",
+			Description: i18n.T("update.downloading_latest_release"),
+			LoadingMsg:  fmt.Sprintf(i18n.T("update.downloading_asset"), assetName),
+			SuccessMsg:  i18n.T("update.download_completed"),
 		},
 	}
 
 	err = command.RunMultipleCommands(commands)
 	if err != nil {
 		// 如果 curl 失败，尝试使用 wget
-		fmt.Println("⚠️  curl failed, trying wget...")
+		fmt.Println(i18n.T("update.curl_failed_try_wget"))
 		commands[0].Command = "wget"
 		commands[0].Args = []string{"-O", zipPath, url}
-		commands[0].LoadingMsg = fmt.Sprintf("Downloading %s with wget...", assetName)
+		commands[0].LoadingMsg = fmt.Sprintf(i18n.T("update.downloading_with_wget"), assetName)
 
 		err = command.RunMultipleCommands(commands)
 		if err != nil {
-			return fmt.Errorf("failed to download with both curl and wget: %w", err)
+			return fmt.Errorf(i18n.T("update.failed_download_both")+": %w", err)
 		}
 	}
 
 	// 解压文件
-	fmt.Println("📂 Extracting downloaded file...")
+	fmt.Println(i18n.T("update.extracting_file"))
 	if err := extractZip(zipPath, tempDir); err != nil {
-		return fmt.Errorf("failed to extract zip: %w", err)
+		return fmt.Errorf(i18n.T("update.failed_extract_zip")+": %w", err)
 	}
 
 	// 安装文件
@@ -161,38 +162,38 @@ func updateUnix() error {
 	extractedBinary := filepath.Join(tempDir, "fastGit")
 	targetPath := filepath.Join(installDir, "fastGit")
 
-	fmt.Printf("📥 Installing to %s...\n", installDir)
+	fmt.Printf(i18n.T("update.installing_to")+": %s...\n", installDir)
 
 	// 检查目标文件是否存在，如果存在先尝试删除以测试权限
 	if _, err := os.Stat(targetPath); err == nil {
 		// 文件存在，尝试移除以测试权限
 		if err := os.Remove(targetPath); err != nil {
-			fmt.Println("⚠️  Root permissions required for installation")
-			fmt.Println("💡 You may be prompted for your password...")
+			fmt.Println(i18n.T("update.root_permissions_required"))
+			fmt.Println(i18n.T("update.password_prompt_hint"))
 			err = runSudoInstall(extractedBinary, targetPath)
 		} else {
 			// 能够删除，说明有权限，直接安装
-			fmt.Println("✓ Direct installation (sufficient permissions)")
+			fmt.Println(i18n.T("update.direct_install_sufficient_permissions"))
 			err = runDirectInstall(extractedBinary, targetPath)
 		}
 	} else {
 		// 文件不存在，尝试创建测试文件来检查权限
 		if hasWritePermission(installDir) {
-			fmt.Println("✓ Direct installation (no sudo required)")
+			fmt.Println(i18n.T("update.direct_install_no_sudo"))
 			err = runDirectInstall(extractedBinary, targetPath)
 		} else {
-			fmt.Println("⚠️  Root permissions required for installation")
-			fmt.Println("💡 You may be prompted for your password...")
+			fmt.Println(i18n.T("update.root_permissions_required"))
+			fmt.Println(i18n.T("update.password_prompt_hint"))
 			err = runSudoInstall(extractedBinary, targetPath)
 		}
 	}
 
 	if err != nil {
-		return fmt.Errorf("failed to install binary: %w", err)
+		return fmt.Errorf(i18n.T("update.failed_install_binary")+": %w", err)
 	}
 
-	fmt.Println("🎉 Update completed successfully!")
-	fmt.Println("💡 Please restart your terminal or run 'source ~/.bashrc' (or equivalent) to use the updated version.")
+	fmt.Println(i18n.T("update.completed_successfully"))
+	fmt.Println(i18n.T("update.restart_terminal_hint"))
 
 	return nil
 }
@@ -251,16 +252,16 @@ func runDirectInstall(source, target string) error {
 		{
 			Command:     "cp",
 			Args:        []string{source, target},
-			Description: "Installing binary to system directory",
-			LoadingMsg:  "Installing fastGit binary...",
-			SuccessMsg:  "Binary installed successfully",
+			Description: i18n.T("update.installing_binary_system"),
+			LoadingMsg:  i18n.T("update.installing_binary"),
+			SuccessMsg:  i18n.T("update.binary_installed_success"),
 		},
 		{
 			Command:     "chmod",
 			Args:        []string{"+x", target},
-			Description: "Setting executable permissions",
-			LoadingMsg:  "Setting permissions...",
-			SuccessMsg:  "Permissions set successfully",
+			Description: i18n.T("update.setting_executable_permissions"),
+			LoadingMsg:  i18n.T("update.setting_permissions"),
+			SuccessMsg:  i18n.T("update.permissions_set_success"),
 		},
 	}
 	return command.RunMultipleCommands(installCommands)
@@ -268,24 +269,24 @@ func runDirectInstall(source, target string) error {
 
 // runSudoInstall 使用交互式 sudo 安装
 func runSudoInstall(source, target string) error {
-	fmt.Println("🔐 Installing with sudo...")
+	fmt.Println(i18n.T("update.installing_with_sudo"))
 
 	// 复制文件
 	_, err := command.RunCmdWithSpinner("sudo",
 		[]string{"cp", source, target},
-		"Installing binary with sudo...",
-		"Binary installed successfully")
+		i18n.T("update.installing_binary_sudo"),
+		i18n.T("update.binary_installed_success"))
 	if err != nil {
-		return fmt.Errorf("failed to copy binary: %w", err)
+		return fmt.Errorf(i18n.T("update.failed_copy_binary")+": %w", err)
 	}
 
 	// 设置权限
 	_, err = command.RunCmdWithSpinner("sudo",
 		[]string{"chmod", "+x", target},
-		"Setting executable permissions...",
-		"Permissions set successfully")
+		i18n.T("update.setting_executable_permissions"),
+		i18n.T("update.permissions_set_success"))
 	if err != nil {
-		return fmt.Errorf("failed to set permissions: %w", err)
+		return fmt.Errorf(i18n.T("update.failed_set_permissions")+": %w", err)
 	}
 
 	return nil

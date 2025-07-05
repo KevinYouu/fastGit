@@ -3,6 +3,7 @@ package form
 import (
 	"errors"
 
+	"github.com/KevinYouu/fastGit/internal/i18n"
 	"github.com/KevinYouu/fastGit/internal/theme"
 	"github.com/charmbracelet/huh"
 )
@@ -15,11 +16,11 @@ func Input(title string, defaultValue string) (string, error) {
 		huh.NewGroup(
 			huh.NewInput().
 				Title(title).
-				Placeholder("请输入...").
+				Placeholder(i18n.T("form.input.placeholder")).
 				Value(&inputValue).
 				Validate(func(str string) error {
 					if str == "" {
-						return errors.New("输入不能为空")
+						return errors.New(i18n.T("form.input.empty.error"))
 					}
 					return nil
 				}),

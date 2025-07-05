@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/KevinYouu/fastGit/internal/i18n"
 	"github.com/KevinYouu/fastGit/internal/theme"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -189,7 +190,7 @@ func (m *ProgressModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.isCompleted = true
 		m.executing = false
 		if msg.Success {
-			m.status = "All commands completed successfully!"
+			m.status = i18n.T("success.operation.complete")
 		}
 		// 减少等待时间，让用户更快看到摘要
 		return m, tea.Tick(500*time.Millisecond, func(time.Time) tea.Msg {
@@ -208,7 +209,7 @@ func (m *ProgressModel) View() string {
 	titleStyle := lipgloss.NewStyle().
 		Foreground(theme.PrimaryColor).
 		Bold(true)
-	s.WriteString(titleStyle.Render("Executing commands..."))
+	s.WriteString(titleStyle.Render(i18n.T("ui.executing.commands")))
 	s.WriteString("\n")
 
 	// 进度条
@@ -229,7 +230,7 @@ func (m *ProgressModel) View() string {
 	}
 
 	s.WriteString(fmt.Sprintf("%s [%s] %.0f%% (%d/%d)\n",
-		theme.InfoStyle.Render("Progress:"),
+		theme.InfoStyle.Render(i18n.T("ui.progress")),
 		theme.ProgressStyle.Render(progressBar),
 		progress*100,
 		m.currentStep,
@@ -248,7 +249,7 @@ func (m *ProgressModel) View() string {
 	}
 
 	s.WriteString(fmt.Sprintf("%s %s %s\n",
-		theme.InfoStyle.Render("Status:"),
+		theme.InfoStyle.Render(i18n.T("ui.status")),
 		statusIcon,
 		lipgloss.NewStyle().Foreground(theme.TextSecondary).Render(m.status)))
 
@@ -301,7 +302,7 @@ func (m *ProgressModel) View() string {
 
 		s.WriteString(fmt.Sprintf("  %s %s\n",
 			style.Render(icon),
-			style.Render(fmt.Sprintf("Step %d: %s", i+1, cmd.Description))))
+			style.Render(fmt.Sprintf(i18n.T("ui.step"), i+1, cmd.Description))))
 	}
 
 	// 完成时的提示
@@ -312,9 +313,9 @@ func (m *ProgressModel) View() string {
 			Italic(true)
 
 		if m.hasError {
-			s.WriteString(hintStyle.Render("💡 Exiting to show error details..."))
+			s.WriteString(hintStyle.Render(i18n.T("ui.exiting.error")))
 		} else {
-			s.WriteString(hintStyle.Render("💡 Exiting..."))
+			s.WriteString(hintStyle.Render(i18n.T("ui.exiting.success")))
 		}
 	}
 
@@ -407,8 +408,8 @@ func printExecutionSummary(model *ProgressModel) {
 		// 显示失败的步骤信息
 		if model.currentStep < len(model.commands) {
 			failedCmd := model.commands[model.currentStep]
-			fmt.Printf("Failed at step %d: %s\n", model.currentStep+1, failedCmd.Description)
-			fmt.Printf("Command: %s %s\n", failedCmd.Command, strings.Join(failedCmd.Args, " "))
+			fmt.Printf("%s", fmt.Sprintf(i18n.T("cmd.failed.step"), model.currentStep+1, failedCmd.Description)+"\n")
+			fmt.Printf(i18n.T("cmd.command")+" %s %s\n", failedCmd.Command, strings.Join(failedCmd.Args, " "))
 		}
 
 		// 显示详细的错误信息
@@ -429,7 +430,7 @@ func printExecutionSummary(model *ProgressModel) {
 		fmt.Println(lipgloss.NewStyle().
 			Foreground(theme.SuccessColor).
 			Bold(true).
-			Render("🎉 All operations completed successfully!"))
+			Render(i18n.T("success.operation.complete")))
 	}
 
 	fmt.Println() // 结尾空行

@@ -8,6 +8,7 @@ import (
 	"github.com/KevinYouu/fastGit/internal/command"
 	"github.com/KevinYouu/fastGit/internal/config"
 	"github.com/KevinYouu/fastGit/internal/form"
+	"github.com/KevinYouu/fastGit/internal/i18n"
 	"github.com/KevinYouu/fastGit/internal/theme"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -28,13 +29,13 @@ func Reset() error {
 		Bold(true).
 		Padding(0, 1)
 
-	fmt.Printf("%s\n", headerStyle.Render("🔄 Git Reset"))
+	fmt.Printf("%s\n", headerStyle.Render(i18n.T("reset.title")))
 
 	// 使用更详细的git log格式获取提交历史
 	cmd := exec.Command("git", "log", "--pretty=format:%h|%s|%ad|%an|%ae", "--date=format:%m-%d %H:%M")
 	output, err := cmd.Output()
 	if err != nil {
-		return fmt.Errorf("Error executing git log command: %w", err)
+		return fmt.Errorf(i18n.T("error.git.log")+" %w", err)
 	}
 
 	lines := strings.Split(string(output), "\n")
@@ -95,7 +96,7 @@ func Reset() error {
 	// 使用表格选择表单
 	_, choose, err := form.TableSelectForm(options)
 	if err != nil {
-		return fmt.Errorf("选择提交错误: %w", err)
+		return fmt.Errorf(i18n.T("reset.error.select.commit")+" %w", err)
 	}
 
 	// 获取选择的提交完整信息
@@ -110,15 +111,15 @@ func Reset() error {
 	// 选择重置模式，使用更紧凑的格式 - 纯文本格式以确保背景色能正确覆盖
 	resetModes := []config.Option{
 		{
-			Label: "Soft - 保留工作目录和暂存区",
+			Label: i18n.T("reset.mode.soft.label"),
 			Value: "--soft",
 		},
 		{
-			Label: "Mixed - 保留工作目录，清空暂存区",
+			Label: i18n.T("reset.mode.mixed.label"),
 			Value: "--mixed",
 		},
 		{
-			Label: "Hard - 丢弃所有未提交的更改",
+			Label: i18n.T("reset.mode.hard.label"),
 			Value: "--hard",
 		},
 	}
@@ -126,7 +127,7 @@ func Reset() error {
 	// 使用表格选择表单选择重置模式
 	_, resetMode, err := form.TableSelectForm(resetModes)
 	if err != nil {
-		return fmt.Errorf("选择重置模式错误: %w", err)
+		return fmt.Errorf(i18n.T("reset.error.select.mode")+" %w", err)
 	}
 
 	// 获取可读的重置模式名称
@@ -149,10 +150,11 @@ func Reset() error {
 		shortMsg = shortMsg[:37] + "..."
 	}
 
-	confirmDesc := fmt.Sprintf("确认重置到 %s  "+"%s "+
-		"%s模式 %s",
+	confirmDesc := fmt.Sprintf("%s %s  %s %s %s%s",
+		i18n.T("reset.confirm.to"),
 		lipgloss.NewStyle().Foreground(theme.PrimaryColor).Bold(true).Render(selectedCommit.Hash),
 		shortMsg,
+		i18n.T("reset.confirm.mode"),
 		modeColor.Render(resetModeReadable),
 		getModeDescription(resetMode),
 	)
@@ -162,7 +164,7 @@ func Reset() error {
 		confirmDesc += "\n" + lipgloss.NewStyle().
 			Foreground(theme.ErrorColor).
 			Bold(true).
-			Render("⚠️ 将丢失所有未提交更改！")
+			Render(i18n.T("reset.hard.warning"))
 	}
 
 	// 使用自定义确认表单
@@ -177,10 +179,10 @@ func Reset() error {
 		resetArgs = append(resetArgs, choose)
 
 		_, err := command.RunCmdWithSpinner("git", resetArgs,
-			fmt.Sprintf("正在重置 (%s)...", resetModeReadable),
-			fmt.Sprintf("已重置到 %s (%s)", choose, resetModeReadable))
+			fmt.Sprintf(i18n.T("reset.executing.mode"), resetModeReadable),
+			fmt.Sprintf(i18n.T("reset.completed.to"), choose, resetModeReadable))
 		if err != nil {
-			return fmt.Errorf("执行git reset命令时出错: %w", err)
+			return fmt.Errorf(i18n.T("reset.error.git.reset")+" %w", err)
 		}
 
 		// 显示简洁的成功信息
@@ -188,7 +190,7 @@ func Reset() error {
 			theme.SuccessStyle.Render("✓"),
 			lipgloss.NewStyle().
 				Foreground(theme.SuccessColor).
-				Render(fmt.Sprintf("重置完成 (HEAD → %s)", choose)))
+				Render(fmt.Sprintf(i18n.T("reset.success.prefix"), choose)))
 
 		// 简洁的操作提示
 		switch resetMode {
@@ -196,22 +198,22 @@ func Reset() error {
 			fmt.Printf("%s\n",
 				lipgloss.NewStyle().
 					Foreground(theme.InfoColor).
-					Render("💡 更改已保留在暂存区"))
+					Render(i18n.T("reset.hint.soft")))
 		case "--mixed":
 			fmt.Printf("%s\n",
 				lipgloss.NewStyle().
 					Foreground(theme.InfoColor).
-					Render("💡 更改已保留在工作区"))
+					Render(i18n.T("reset.hint.mixed")))
 		case "--hard":
 			fmt.Printf("%s\n",
 				lipgloss.NewStyle().
 					Foreground(theme.InfoColor).
-					Render("💡 所有未提交更改已丢弃"))
+					Render(i18n.T("reset.hint.hard")))
 		}
 	} else {
 		fmt.Printf("\n%s %s\n",
 			theme.InfoStyle.Render("ℹ️"),
-			theme.InfoStyle.Render("已取消"))
+			theme.InfoStyle.Render(i18n.T("reset.cancelled.msg")))
 	}
 	return nil
 }
@@ -222,15 +224,15 @@ func getModeDescription(mode string) string {
 	case "--soft":
 		return lipgloss.NewStyle().
 			Foreground(theme.TextSecondary).
-			Render(" (保留全部)")
+			Render(i18n.T("reset.mode.soft.desc"))
 	case "--mixed":
 		return lipgloss.NewStyle().
 			Foreground(theme.TextSecondary).
-			Render(" (默认)")
+			Render(i18n.T("reset.mode.mixed.desc"))
 	case "--hard":
 		return lipgloss.NewStyle().
 			Foreground(theme.TextSecondary).
-			Render(" (危险)")
+			Render(i18n.T("reset.mode.hard.desc"))
 	default:
 		return ""
 	}

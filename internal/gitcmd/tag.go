@@ -10,6 +10,7 @@ import (
 	"github.com/KevinYouu/fastGit/internal/command"
 	"github.com/KevinYouu/fastGit/internal/config"
 	"github.com/KevinYouu/fastGit/internal/form"
+	"github.com/KevinYouu/fastGit/internal/i18n"
 )
 
 func CreateAndPushTag() error {
@@ -19,12 +20,12 @@ func CreateAndPushTag() error {
 	}
 	newVersion := incrementVersion(latestVersion)
 
-	version, err := form.Input("Enter your version: ", newVersion)
+	version, err := form.Input(i18n.T("tag.input.version"), newVersion)
 	if err != nil {
 		return fmt.Errorf("get version error: %w", err)
 	}
 
-	commitMessage, err := form.Input("Enter your commit message: ", "")
+	commitMessage, err := form.Input(i18n.T("tag.input.commit.message"), "")
 	if err != nil {
 		return fmt.Errorf("get commit message error: %w", err)
 	}
@@ -34,16 +35,16 @@ func CreateAndPushTag() error {
 		{
 			Command:     "git",
 			Args:        []string{"tag", "-a", version, "-m", commitMessage},
-			Description: "Creating annotated tag",
-			LoadingMsg:  "Creating tag...",
-			SuccessMsg:  fmt.Sprintf("Tag %s created successfully", version),
+			Description: i18n.T("tag.create.description"),
+			LoadingMsg:  i18n.T("tag.create.loading"),
+			SuccessMsg:  fmt.Sprintf(i18n.T("tag.create.success"), version),
 		},
 		{
 			Command:     "git",
 			Args:        []string{"push", "origin", version},
-			Description: "Pushing tag to remote repository",
-			LoadingMsg:  "Pushing tag to remote...",
-			SuccessMsg:  fmt.Sprintf("Tag %s pushed successfully", version),
+			Description: i18n.T("tag.push.description"),
+			LoadingMsg:  i18n.T("tag.push.loading"),
+			SuccessMsg:  fmt.Sprintf(i18n.T("tag.push.success"), version),
 		},
 	}
 
@@ -111,7 +112,7 @@ func GetAllTags() ([]string, error) {
 	}
 
 	if len(tags) == 0 {
-		return nil, fmt.Errorf("no tags found in repository")
+		return nil, fmt.Errorf("%s", i18n.T("tag.no.tags"))
 	}
 
 	return tags, nil
@@ -155,15 +156,15 @@ func DeleteAndPushTag() error {
 	}
 
 	// 让用户选择要删除的标签
-	_, selectedTag, err := form.SelectForm("Choose a tag to delete", options)
+	_, selectedTag, err := form.SelectForm(i18n.T("tag.delete.select"), options)
 	if err != nil {
 		return fmt.Errorf("select tag error: %w", err)
 	}
 
 	// 确认删除操作
-	confirmMessage := fmt.Sprintf("Are you sure you want to delete tag '%s'?\nThis will remove the tag both locally and from the remote repository.", selectedTag)
+	confirmMessage := fmt.Sprintf(i18n.T("tag.delete.confirm"), selectedTag)
 	if !form.Confirm(confirmMessage) {
-		fmt.Println("🚫 Tag deletion cancelled.")
+		fmt.Println(i18n.T("tag.delete.cancelled"))
 		return nil
 	}
 
@@ -172,16 +173,16 @@ func DeleteAndPushTag() error {
 		{
 			Command:     "git",
 			Args:        []string{"tag", "-d", selectedTag},
-			Description: "Deleting local tag",
-			LoadingMsg:  fmt.Sprintf("Deleting local tag %s...", selectedTag),
-			SuccessMsg:  fmt.Sprintf("Local tag %s deleted successfully", selectedTag),
+			Description: i18n.T("tag.delete.local"),
+			LoadingMsg:  fmt.Sprintf(i18n.T("tag.delete.local.loading"), selectedTag),
+			SuccessMsg:  fmt.Sprintf(i18n.T("tag.delete.local.success"), selectedTag),
 		},
 		{
 			Command:     "git",
 			Args:        []string{"push", "origin", ":refs/tags/" + selectedTag},
-			Description: "Deleting remote tag",
-			LoadingMsg:  fmt.Sprintf("Deleting remote tag %s...", selectedTag),
-			SuccessMsg:  fmt.Sprintf("Remote tag %s deleted successfully", selectedTag),
+			Description: i18n.T("tag.delete.remote"),
+			LoadingMsg:  fmt.Sprintf(i18n.T("tag.delete.remote.loading"), selectedTag),
+			SuccessMsg:  fmt.Sprintf(i18n.T("tag.delete.remote.success"), selectedTag),
 		},
 	}
 

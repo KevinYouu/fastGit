@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/KevinYouu/fastGit/internal/i18n"
 	"github.com/KevinYouu/fastGit/internal/spinner"
 	"github.com/KevinYouu/fastGit/internal/theme"
 	tea "github.com/charmbracelet/bubbletea"
@@ -72,7 +73,7 @@ func RunCmdWithSpinner(command string, args []string, loadingMsg, successMsg str
 				lipgloss.NewStyle().
 					Foreground(theme.ErrorColor).
 					Bold(true).
-					Render("Error details:"))
+					Render(i18n.T("ui.error.details")))
 			fmt.Printf("%s\n",
 				lipgloss.NewStyle().
 					Foreground(theme.TextSecondary).
@@ -177,7 +178,7 @@ func RunCmdWithProgress(command string, args []string, loadingMsg, successMsg st
 				lipgloss.NewStyle().
 					Foreground(theme.ErrorColor).
 					Bold(true).
-					Render("Error details:"))
+					Render(i18n.T("ui.error.details")))
 			fmt.Printf("%s\n",
 				lipgloss.NewStyle().
 					Foreground(theme.TextSecondary).
@@ -341,7 +342,7 @@ func RunCmdWithCustomSpinner(command string, args []string, message string, spin
 				lipgloss.NewStyle().
 					Foreground(theme.ErrorColor).
 					Bold(true).
-					Render("Error details:"))
+					Render(i18n.T("ui.error.details")))
 			fmt.Printf("%s\n",
 				lipgloss.NewStyle().
 					Foreground(theme.TextSecondary).

@@ -343,10 +343,29 @@ var zhTranslations = map[string]string{
 	"tag.delete.remote.success": "远程标签 %s 删除成功",
 
 	// Merge operations - detailed
-	"merge.no.branches":     "没有分支可以合并。",
-	"merge.select.target":   "选择要合并到当前分支的分支名称",
-	"merge.success.message": "分支合并成功。",
-	"merge.failed":          "合并失败：",
+	"merge.no.branches":                     "没有分支可以合并。",
+	"merge.select.target":                   "选择要合并到当前分支的分支：",
+	"merge.select.strategy":                 "选择合并策略：",
+	"merge.success.message":                 "合并成功完成。",
+	"merge.failed":                          "合并失败",
+	"merge.starting":                        "开始使用 %s 策略合并 '%s'...",
+	"merge.warning.dirty.working.directory": "⚠️  警告：工作目录中有未提交的更改。",
+	"merge.confirm.continue.with.changes":   "是否仍要继续合并？",
+	"merge.conflict.detected":               "🔀 检测到合并冲突！",
+	"merge.conflict.instructions":           "💡 请手动解决冲突，然后运行 'git add <文件>' 和 'git commit'",
+	"merge.fast.forward.failed":             "❌ 无法进行快进合并",
+	"merge.fast.forward.suggestion":         "💡 尝试使用'非快进'策略或解决任何冲突",
+	"merge.uncommitted.changes":             "❌ 您有未提交的更改将被覆盖",
+
+	// Merge strategies - 合并策略
+	"merge.strategy.default.name":        "默认",
+	"merge.strategy.default.description": "默认合并行为",
+	"merge.strategy.ff.only.name":        "仅快进",
+	"merge.strategy.ff.only.description": "仅在可以快进合并时进行合并",
+	"merge.strategy.no.ff.name":          "非快进",
+	"merge.strategy.no.ff.description":   "始终创建合并提交",
+	"merge.strategy.squash.name":         "压缩",
+	"merge.strategy.squash.description":  "将所有提交压缩为单个提交",
 
 	// Error messages - detailed
 	"error.get.options":        "获取选项失败：",

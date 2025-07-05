@@ -315,10 +315,29 @@ var enTranslations = map[string]string{
 	"tag.delete.remote.success": "Remote tag %s deleted successfully",
 
 	// Merge operations - detailed
-	"merge.no.branches":     "No branches to merge.",
-	"merge.select.target":   "Branch name to merge into the current branch",
-	"merge.success.message": "Merge branch successfully.",
-	"merge.failed":          "Failed to merge:",
+	"merge.no.branches":                     "No branches to merge.",
+	"merge.select.target":                   "Select branch to merge into current branch:",
+	"merge.select.strategy":                 "Select merge strategy:",
+	"merge.success.message":                 "Merge completed successfully.",
+	"merge.failed":                          "Failed to merge",
+	"merge.starting":                        "Starting merge of '%s' using %s strategy...",
+	"merge.warning.dirty.working.directory": "⚠️  Warning: You have uncommitted changes in your working directory.",
+	"merge.confirm.continue.with.changes":   "Continue with merge anyway?",
+	"merge.conflict.detected":               "🔀 Merge conflict detected!",
+	"merge.conflict.instructions":           "💡 Resolve conflicts manually, then run 'git add <file>' and 'git commit'",
+	"merge.fast.forward.failed":             "❌ Fast-forward merge not possible",
+	"merge.fast.forward.suggestion":         "💡 Try using 'No fast-forward' strategy or resolve any conflicts",
+	"merge.uncommitted.changes":             "❌ You have uncommitted changes that would be overwritten",
+
+	// Merge strategies
+	"merge.strategy.default.name":        "Default",
+	"merge.strategy.default.description": "Default merge behavior",
+	"merge.strategy.ff.only.name":        "Fast-forward only",
+	"merge.strategy.ff.only.description": "Only merge if fast-forward is possible",
+	"merge.strategy.no.ff.name":          "No fast-forward",
+	"merge.strategy.no.ff.description":   "Always create a merge commit",
+	"merge.strategy.squash.name":         "Squash",
+	"merge.strategy.squash.description":  "Squash all commits into a single commit",
 
 	// Error messages - detailed
 	"error.get.options":        "Failed to get options:",

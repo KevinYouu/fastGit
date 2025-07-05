@@ -216,6 +216,34 @@ var enTranslations = map[string]string{
 	"update.failed_copy_binary":                    "failed to copy binary",
 	"update.failed_set_permissions":                "failed to set permissions",
 
+	// Update command descriptions
+	"update.cmd.download":            "Download latest version",
+	"update.cmd.install":             "Install binary to system directory",
+	"update.cmd.install.loading":     "Installing fastGit binary...",
+	"update.cmd.install.success":     "Binary installed successfully",
+	"update.cmd.permissions":         "Set executable permissions",
+	"update.cmd.permissions.loading": "Setting permissions...",
+	"update.cmd.permissions.success": "Permissions set successfully",
+	"update.cmd.sudo.install":        "Installing binary with sudo...",
+	"update.cmd.sudo.permissions":    "Setting executable permissions...",
+
+	// Update error messages
+	"update.error.version":  "Failed to get latest version:",
+	"update.error.temp.dir": "Failed to create temp directory:",
+
+	// Error messages
+	"error.git.log":           "Error executing git log command:",
+	"error.file.status":       "Failed to get file status:",
+	"error.select.form":       "error selecting files:",
+	"error.command.execution": "Error executing command:",
+	"error.permission.denied": "Permission denied:",
+	"error.file.not.found":    "File not found:",
+
+	// Success messages
+	"success.operation.complete": "🎉 All operations completed successfully!",
+	"success.step.complete":      "Step completed:",
+	"success.file.saved":         "File saved successfully:",
+
 	// Command execution
 	"cmd.failed.step": "Failed at step %d: %s",
 	"cmd.command":     "Command:",
@@ -343,8 +371,6 @@ var enTranslations = map[string]string{
 	"error.get.options":        "Failed to get options:",
 	"error.get.file.status":    "Failed to get file statuses",
 	"error.multiselect.form":   "Failed to get file statuses:",
-	"error.file.status":        "Failed to get file status:",
-	"error.select.form":        "error selecting files:",
 	"error.select.form.detail": "error selecting branch:",
 	"error.current.branch":     "Failed to get current branch:",
 }

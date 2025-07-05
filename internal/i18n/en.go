@@ -343,6 +343,8 @@ var enTranslations = map[string]string{
 	"error.get.options":        "Failed to get options:",
 	"error.get.file.status":    "Failed to get file statuses",
 	"error.multiselect.form":   "Failed to get file statuses:",
+	"error.file.status":        "Failed to get file status:",
+	"error.select.form":        "error selecting files:",
 	"error.select.form.detail": "error selecting branch:",
 	"error.current.branch":     "Failed to get current branch:",
 }

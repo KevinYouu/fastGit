@@ -377,8 +377,8 @@ func (m *ProgressModel) executeCommand(step int) tea.Cmd {
 	}
 }
 
-// RunMultipleCommandsWithBubbleTea 使用 Bubble Tea 执行多个命令
-func RunMultipleCommandsWithBubbleTea(commands []CommandInfo) error {
+// RunMultipleCommands 使用 Bubble Tea 执行多个命令
+func RunMultipleCommands(commands []CommandInfo) error {
 	model := NewProgressModel(commands)
 	p := tea.NewProgram(model)
 
@@ -434,19 +434,4 @@ func printExecutionSummary(model *ProgressModel) {
 	}
 
 	fmt.Println() // 结尾空行
-}
-
-// RunMultipleCommandsWithProgress 使用 Bubble Tea 执行多个命令（别名，保持向后兼容）
-func RunMultipleCommandsWithProgress(commands []CommandInfo) error {
-	return RunMultipleCommandsWithBubbleTea(commands)
-}
-
-// RunMultipleCommandsWithSimpleProgress 使用统一的进度条组件执行多个命令（别名，保持向后兼容）
-func RunMultipleCommandsWithSimpleProgress(commands []CommandInfo) error {
-	return RunMultipleCommandsWithBubbleTea(commands)
-}
-
-// RunMultipleCommands 主要入口函数 - 使用 Bubble Tea 执行多个命令
-func RunMultipleCommands(commands []CommandInfo) error {
-	return RunMultipleCommandsWithBubbleTea(commands)
 }

@@ -277,7 +277,7 @@ func RunMultiStepCommand(steps []MultiStepInfo) error {
 	}
 
 	// 使用统一的进度条组件
-	return RunMultipleCommandsWithBubbleTea(commands)
+	return RunMultipleCommands(commands)
 }
 
 // MultiStepInfo 多步骤信息结构

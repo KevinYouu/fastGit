@@ -87,7 +87,7 @@ func PushSelected() error {
 		},
 	}
 
-	err = command.RunMultipleCommandsWithBubbleTea(commands)
+	err = command.RunMultipleCommands(commands)
 	if err != nil {
 		return err
 	}

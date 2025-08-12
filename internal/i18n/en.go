@@ -32,6 +32,9 @@ var enTranslations = map[string]string{
 	// Merge command
 	"merge.short": "Merge branches",
 
+	// Cherry-pick command
+	"cherry.pick.short": "Cherry-pick commits from other branches",
+
 	// Update command
 	"update.short": "Update fastGit to the latest version",
 
@@ -39,11 +42,12 @@ var enTranslations = map[string]string{
 	"init.short": "Initialize a new git repository",
 
 	// Common messages
-	"error.general":    "An error occurred:",
-	"success.general":  "Operation completed successfully",
-	"confirm.continue": "Do you want to continue?",
-	"select.option":    "Please select an option:",
-	"input.required":   "This field is required",
+	"error.general":      "An error occurred:",
+	"error.not.git.repo": "Not a git repository",
+	"success.general":    "Operation completed successfully",
+	"confirm.continue":   "Do you want to continue?",
+	"select.option":      "Please select an option:",
+	"input.required":     "This field is required",
 
 	// Git specific
 	"git.branch":           "Branch:",
@@ -365,6 +369,39 @@ var enTranslations = map[string]string{
 	"merge.strategy.no.ff.description":   "Always create a merge commit",
 	"merge.strategy.squash.name":         "Squash",
 	"merge.strategy.squash.description":  "Squash all commits into a single commit",
+
+	// Cherry-pick messages
+	"cherry.pick.select.commits":      "Select commits to cherry-pick:",
+	"cherry.pick.select.option":       "Select cherry-pick option:",
+	"cherry.pick.no.commits.selected": "No commits selected for cherry-pick",
+	"cherry.pick.success.commit":      "Successfully cherry-picked commit",
+	"cherry.pick.success.all":         "✅ All commits cherry-picked successfully!",
+	"cherry.pick.executing":           "Executing",
+	"cherry.pick.progress":            "Cherry-picking commit...",
+	"cherry.pick.error.get.commits":   "Failed to get commits",
+	"cherry.pick.error.no.commits":    "No commits found",
+	"cherry.pick.error.execute":       "Failed to execute cherry-pick",
+
+	// Cherry-pick conflict and error handling
+	"cherry.pick.conflict.detected":          "🔀 Cherry-pick conflict detected!",
+	"cherry.pick.conflict.instructions":      "💡 Resolve conflicts manually, then run 'git add <file>' and 'git cherry-pick --continue'",
+	"cherry.pick.conflict.output":            "Git output",
+	"cherry.pick.conflict.resolution.needed": "Cherry-pick conflicts need to be resolved manually",
+	"cherry.pick.empty.commit":               "⚠️  Empty commit detected",
+	"cherry.pick.empty.commit.error":         "Cannot cherry-pick empty commit",
+	"cherry.pick.already.applied":            "✅ Commit already applied",
+	"cherry.pick.failed.output":              "Cherry-pick failed with output",
+	"cherry.pick.failed.generic":             "Cherry-pick failed",
+
+	// Cherry-pick options
+	"cherry.pick.option.default.name":          "Default",
+	"cherry.pick.option.default.description":   "Standard cherry-pick",
+	"cherry.pick.option.no.commit.name":        "No commit",
+	"cherry.pick.option.no.commit.description": "Apply changes without committing",
+	"cherry.pick.option.edit.name":             "Edit",
+	"cherry.pick.option.edit.description":      "Edit commit message before committing",
+	"cherry.pick.option.signoff.name":          "Sign-off",
+	"cherry.pick.option.signoff.description":   "Add Signed-off-by line to commit message",
 
 	// Error messages - detailed
 	"error.get.options":        "Failed to get options:",

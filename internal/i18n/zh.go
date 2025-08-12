@@ -32,6 +32,9 @@ var zhTranslations = map[string]string{
 	// Merge command
 	"merge.short": "合并分支",
 
+	// Cherry-pick command
+	"cherry.pick.short": "从其他分支选择提交",
+
 	// Update command
 	"update.short": "更新 fastGit 到最新版本",
 
@@ -39,11 +42,12 @@ var zhTranslations = map[string]string{
 	"init.short": "初始化新的 git 仓库",
 
 	// Common messages
-	"error.general":    "发生错误：",
-	"success.general":  "操作成功完成",
-	"confirm.continue": "您想要继续吗？",
-	"select.option":    "请选择一个选项：",
-	"input.required":   "此字段为必填项",
+	"error.general":      "发生错误：",
+	"error.not.git.repo": "不是 git 仓库",
+	"success.general":    "操作成功完成",
+	"confirm.continue":   "您想要继续吗？",
+	"select.option":      "请选择一个选项：",
+	"input.required":     "此字段为必填项",
 
 	// Git specific
 	"git.branch":           "分支：",
@@ -365,6 +369,39 @@ var zhTranslations = map[string]string{
 	"merge.strategy.no.ff.description":   "始终创建合并提交",
 	"merge.strategy.squash.name":         "压缩",
 	"merge.strategy.squash.description":  "将所有提交压缩为单个提交",
+
+	// Cherry-pick messages - 选择提交相关信息
+	"cherry.pick.select.commits":      "选择要 cherry-pick 的提交：",
+	"cherry.pick.select.option":       "选择 cherry-pick 选项：",
+	"cherry.pick.no.commits.selected": "未选择任何提交进行 cherry-pick",
+	"cherry.pick.success.commit":      "成功 cherry-pick 提交",
+	"cherry.pick.success.all":         "✅ 所有提交已成功 cherry-pick！",
+	"cherry.pick.executing":           "正在执行",
+	"cherry.pick.progress":            "正在 cherry-pick 提交...",
+	"cherry.pick.error.get.commits":   "获取提交失败",
+	"cherry.pick.error.no.commits":    "未找到提交",
+	"cherry.pick.error.execute":       "执行 cherry-pick 失败",
+
+	// Cherry-pick conflict and error handling - Cherry-pick 冲突和错误处理
+	"cherry.pick.conflict.detected":          "🔀 检测到 cherry-pick 冲突！",
+	"cherry.pick.conflict.instructions":      "💡 请手动解决冲突，然后运行 'git add <文件>' 和 'git cherry-pick --continue'",
+	"cherry.pick.conflict.output":            "Git 输出",
+	"cherry.pick.conflict.resolution.needed": "Cherry-pick 冲突需要手动解决",
+	"cherry.pick.empty.commit":               "⚠️  检测到空提交",
+	"cherry.pick.empty.commit.error":         "无法 cherry-pick 空提交",
+	"cherry.pick.already.applied":            "✅ 提交已应用",
+	"cherry.pick.failed.output":              "Cherry-pick 失败，输出",
+	"cherry.pick.failed.generic":             "Cherry-pick 失败",
+
+	// Cherry-pick options - Cherry-pick 选项
+	"cherry.pick.option.default.name":          "默认",
+	"cherry.pick.option.default.description":   "标准 cherry-pick",
+	"cherry.pick.option.no.commit.name":        "不提交",
+	"cherry.pick.option.no.commit.description": "应用更改但不提交",
+	"cherry.pick.option.edit.name":             "编辑",
+	"cherry.pick.option.edit.description":      "提交前编辑提交信息",
+	"cherry.pick.option.signoff.name":          "签名",
+	"cherry.pick.option.signoff.description":   "在提交信息中添加 Signed-off-by 行",
 
 	// Error messages - detailed
 	"error.get.options":        "获取选项失败：",

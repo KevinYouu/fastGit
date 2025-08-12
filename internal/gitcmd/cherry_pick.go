@@ -3,7 +3,9 @@ package gitcmd
 import (
 	"fmt"
 	"os/exec"
+	"sort"
 	"strings"
+	"time"
 
 	"github.com/KevinYouu/fastGit/internal/config"
 	"github.com/KevinYouu/fastGit/internal/form"
@@ -92,27 +94,59 @@ func CherryPick() error {
 }
 
 func getAllCommitsForCherryPick() ([]Commit, error) {
-	// Get all branches
-	cmd := exec.Command("git", "branch", "-a", "--format=%(refname:short)")
-	output, err := cmd.Output()
+	// First, get current branch name
+	currentBranchCmd := exec.Command("git", "branch", "--show-current")
+	currentBranchOutput, err := currentBranchCmd.Output()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get current branch: %v", err)
+	}
+	currentBranch := strings.TrimSpace(string(currentBranchOutput))
+
+	// Get all commit hashes that are reachable from current branch
+	// This includes commits that were merged or are part of current branch history
+	reachableFromCurrentCmd := exec.Command("git", "rev-list", currentBranch)
+	reachableOutput, err := reachableFromCurrentCmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get commits reachable from current branch: %v", err)
 	}
 
-	branches := strings.Fields(string(output))
-	var allCommits []Commit
+	// Create a set of commit hashes that are already reachable from current branch
+	reachableCommits := make(map[string]bool)
+	for _, hash := range strings.Split(strings.TrimSpace(string(reachableOutput)), "\n") {
+		if hash != "" {
+			reachableCommits[hash] = true
+		}
+	}
 
-	// Get commits from each branch
+	// Get all remote branches
+	branchesCmd := exec.Command("git", "branch", "-r", "--format=%(refname:short)")
+	branchesOutput, err := branchesCmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get branches: %v", err)
+	}
+
+	branches := strings.Fields(string(branchesOutput))
+	commitMap := make(map[string]Commit) // Use map to deduplicate by hash
+	var commits []Commit
+
+	// Get commits from each remote branch that are NOT reachable from current branch
 	for _, branch := range branches {
-		// Skip remote tracking branches that are duplicates
-		if strings.HasPrefix(branch, "origin/") {
+		// Skip HEAD references
+		if strings.Contains(branch, "HEAD") {
 			continue
 		}
 
-		cmd := exec.Command("git", "log", branch, "--pretty=format:%H|%s|%an|%ae|%ad", "--date=short", "-20")
+		// Skip if this is the current branch's remote tracking branch
+		if strings.HasSuffix(branch, "/"+currentBranch) {
+			continue
+		}
+
+		// Get commits from this branch that are not reachable from current branch
+		// Using git log with --not to exclude commits reachable from current branch
+		cmd := exec.Command("git", "log", branch, "--not", currentBranch, "--pretty=format:%H|%s|%an|%ae|%ai|%ad", "--date=short", "-30")
 		output, err := cmd.Output()
 		if err != nil {
-			continue // Skip if branch doesn't exist or has no commits
+			continue // Skip if branch doesn't exist or has no unique commits
 		}
 
 		lines := strings.Split(strings.TrimSpace(string(output)), "\n")
@@ -121,21 +155,115 @@ func getAllCommitsForCherryPick() ([]Commit, error) {
 				continue
 			}
 			parts := strings.Split(line, "|")
-			if len(parts) >= 5 {
+			if len(parts) >= 6 {
+				hash := parts[0]
+
+				// Double check: skip if this commit is reachable from current branch
+				if reachableCommits[hash] {
+					continue
+				}
+
+				// Skip if we already processed this commit
+				if _, exists := commitMap[hash]; exists {
+					continue
+				}
+
+				// Check if this commit has already been merged (using git merge-base)
+				mergeBaseCmd := exec.Command("git", "merge-base", "--is-ancestor", hash, currentBranch)
+				if mergeBaseCmd.Run() == nil {
+					// This commit is an ancestor of current branch, so it's already merged
+					continue
+				}
+
 				commit := Commit{
-					Hash:    parts[0],
+					Hash:    hash,
 					Message: parts[1],
 					Author:  parts[2],
 					Email:   parts[3],
-					Date:    parts[4],
+					Date:    parts[5], // Use the short date format
 					IsHead:  false,
 				}
-				allCommits = append(allCommits, commit)
+
+				// Parse the ISO timestamp for sorting
+				if timestamp, err := time.Parse("2006-01-02 15:04:05 -0700", parts[4]); err == nil {
+					commit.Timestamp = timestamp
+				}
+
+				// Store which branch this commit comes from (for display purposes)
+				branchName := strings.TrimPrefix(branch, "origin/")
+				commit.Message = fmt.Sprintf("[%s] %s", branchName, parts[1])
+
+				commitMap[hash] = commit
+				commits = append(commits, commit)
 			}
 		}
 	}
 
-	return allCommits, nil
+	// Also get commits from local branches (non-remote)
+	localBranchesCmd := exec.Command("git", "branch", "--format=%(refname:short)")
+	localBranchesOutput, err := localBranchesCmd.Output()
+	if err == nil {
+		localBranches := strings.Fields(string(localBranchesOutput))
+		for _, branch := range localBranches {
+			// Skip current branch
+			if branch == currentBranch {
+				continue
+			}
+
+			// Get commits from this local branch that are not in current branch
+			cmd := exec.Command("git", "log", branch, "--not", currentBranch, "--pretty=format:%H|%s|%an|%ae|%ai|%ad", "--date=short", "-30")
+			output, err := cmd.Output()
+			if err != nil {
+				continue
+			}
+
+			lines := strings.Split(strings.TrimSpace(string(output)), "\n")
+			for _, line := range lines {
+				if line == "" {
+					continue
+				}
+				parts := strings.Split(line, "|")
+				if len(parts) >= 6 {
+					hash := parts[0]
+
+					// Skip if this commit is reachable from current branch or already processed
+					if reachableCommits[hash] || commitMap[hash].Hash != "" {
+						continue
+					}
+
+					// Check if this commit has already been merged
+					mergeBaseCmd := exec.Command("git", "merge-base", "--is-ancestor", hash, currentBranch)
+					if mergeBaseCmd.Run() == nil {
+						continue
+					}
+
+					commit := Commit{
+						Hash:    hash,
+						Message: parts[1],
+						Author:  parts[2],
+						Email:   parts[3],
+						Date:    parts[5],
+						IsHead:  false,
+					}
+
+					if timestamp, err := time.Parse("2006-01-02 15:04:05 -0700", parts[4]); err == nil {
+						commit.Timestamp = timestamp
+					}
+
+					commit.Message = fmt.Sprintf("[%s] %s", branch, parts[1])
+					commitMap[hash] = commit
+					commits = append(commits, commit)
+				}
+			}
+		}
+	}
+
+	// Sort commits by timestamp (newest first)
+	sort.Slice(commits, func(i, j int) bool {
+		return commits[i].Timestamp.After(commits[j].Timestamp)
+	})
+
+	return commits, nil
 }
 
 func selectCommitsForCherryPick(commits []Commit) ([]Commit, error) {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/KevinYouu/fastGit/internal/command"
 	"github.com/KevinYouu/fastGit/internal/config"
@@ -14,12 +15,13 @@ import (
 )
 
 type Commit struct {
-	Hash    string
-	Message string
-	Date    string
-	Author  string
-	Email   string
-	IsHead  bool
+	Hash      string
+	Message   string
+	Date      string
+	Author    string
+	Email     string
+	IsHead    bool
+	Timestamp time.Time
 }
 
 func Reset() error {
@@ -31,8 +33,8 @@ func Reset() error {
 
 	fmt.Printf("%s\n", headerStyle.Render(i18n.T("reset.title")))
 
-	// 使用更详细的git log格式获取提交历史
-	cmd := exec.Command("git", "log", "--pretty=format:%h|%s|%ad|%an|%ae", "--date=format:%m-%d %H:%M")
+	// 使用更详细的git log格式获取提交历史，包含ISO时间戳用于排序
+	cmd := exec.Command("git", "log", "--pretty=format:%h|%s|%ad|%an|%ae|%ai", "--date=format:%m-%d %H:%M")
 	output, err := cmd.Output()
 	if err != nil {
 		return fmt.Errorf(i18n.T("error.git.log")+" %w", err)
@@ -45,22 +47,31 @@ func Reset() error {
 	// 解析并存储提交信息（不显示历史记录）
 	for i, line := range lines {
 		parts := strings.Split(line, "|")
-		if len(parts) == 5 {
+		if len(parts) >= 5 {
 			hash := parts[0]
 			message := parts[1]
 			date := parts[2]
 			author := parts[3]
 			email := parts[4]
 
-			// 存储提交信息
-			commits = append(commits, Commit{
+			commit := Commit{
 				Hash:    hash,
 				Message: message,
 				Date:    date,
 				Author:  author,
 				Email:   email,
 				IsHead:  i == 0,
-			})
+			}
+
+			// 解析时间戳用于排序（如果有的话）
+			if len(parts) >= 6 {
+				if timestamp, err := time.Parse("2006-01-02 15:04:05 -0700", parts[5]); err == nil {
+					commit.Timestamp = timestamp
+				}
+			}
+
+			// 存储提交信息
+			commits = append(commits, commit)
 
 			// 限制消息长度，避免过长
 			shortMsg := message

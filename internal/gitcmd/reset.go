@@ -178,9 +178,10 @@ func Reset() error {
 		}
 		resetArgs = append(resetArgs, choose)
 
-		_, err := command.RunCmdWithSpinner("git", resetArgs,
+		_, err := command.RunCmdWithSpinnerOptions("git", resetArgs,
 			fmt.Sprintf(i18n.T("reset.executing.mode"), resetModeReadable),
-			fmt.Sprintf(i18n.T("reset.completed.to"), choose, resetModeReadable))
+			fmt.Sprintf(i18n.T("reset.completed.to"), choose, resetModeReadable), true)
+
 		if err != nil {
 			return fmt.Errorf(i18n.T("reset.error.git.reset")+" %w", err)
 		}

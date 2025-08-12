@@ -13,11 +13,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// RunCmdWithSpinner 带加载动画的命令执行
-func RunCmdWithSpinner(command string, args []string, loadingMsg, successMsg string) (string, error) {
-	return RunCmdWithSpinnerOptions(command, args, loadingMsg, successMsg, true)
-}
-
 // RunCmdWithSpinnerOptions 带加载动画的命令执行（带选项）
 func RunCmdWithSpinnerOptions(command string, args []string, loadingMsg, successMsg string, showOutput bool) (string, error) {
 	// 创建加载动画的channel

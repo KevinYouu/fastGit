@@ -85,10 +85,10 @@ func UpdateSelf() error {
 	// Windows 使用 PowerShell 脚本
 	if runtime.GOOS == "windows" {
 		fmt.Println(i18n.T("update.running_windows_script"))
-		_, err := command.RunCmdWithSpinner("powershell",
+		_, err := command.RunCmdWithSpinnerOptions("powershell",
 			[]string{"-Command", "iwr -useb https://raw.githubusercontent.com/KevinYouu/fastGit/main/install.ps1 | iex"},
 			i18n.T("update.downloading_running_script"),
-			i18n.T("update.script_executed_success"))
+			i18n.T("update.script_executed_success"), true)
 		if err != nil {
 			return fmt.Errorf(i18n.T("update.failed_run_script")+": %w", err)
 		}
@@ -272,19 +272,19 @@ func runSudoInstall(source, target string) error {
 	fmt.Println(i18n.T("update.installing_with_sudo"))
 
 	// 复制文件
-	_, err := command.RunCmdWithSpinner("sudo",
+	_, err := command.RunCmdWithSpinnerOptions("sudo",
 		[]string{"cp", source, target},
 		i18n.T("update.installing_binary_sudo"),
-		i18n.T("update.binary_installed_success"))
+		i18n.T("update.binary_installed_success"), true)
 	if err != nil {
 		return fmt.Errorf(i18n.T("update.failed_copy_binary")+": %w", err)
 	}
 
 	// 设置权限
-	_, err = command.RunCmdWithSpinner("sudo",
+	_, err = command.RunCmdWithSpinnerOptions("sudo",
 		[]string{"chmod", "+x", target},
 		i18n.T("update.setting_executable_permissions"),
-		i18n.T("update.permissions_set_success"))
+		i18n.T("update.permissions_set_success"), true)
 	if err != nil {
 		return fmt.Errorf(i18n.T("update.failed_set_permissions")+": %w", err)
 	}

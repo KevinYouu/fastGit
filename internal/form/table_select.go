@@ -265,17 +265,3 @@ func TableSelectForm(options []config.Option) (label, value string, err error) {
 
 	return "", "", fmt.Errorf("%s", i18n.T("table.no.selection"))
 }
-
-// TableSelectFormWithStringSlice 创建一个基于字符串切片的表格选择表单
-func TableSelectFormWithStringSlice(title string, options []string) (label, value string, err error) {
-	// 转换为 config.Option 格式
-	configOptions := make([]config.Option, len(options))
-	for i, opt := range options {
-		configOptions[i] = config.Option{
-			Label: opt,
-			Value: opt,
-		}
-	}
-
-	return TableSelectForm(configOptions)
-}
